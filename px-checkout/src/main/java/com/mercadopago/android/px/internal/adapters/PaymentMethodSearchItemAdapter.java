@@ -1,9 +1,7 @@
 package com.mercadopago.android.px.internal.adapters;
 
 import android.content.Context;
-import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,13 +55,15 @@ public class PaymentMethodSearchItemAdapter extends RecyclerView.Adapter<Payment
         private final TextView comment;
         private final TextView discountInfo;
         private final ImageView icon;
+        private final ImageView badge;
 
         public ViewHolder(final View itemView) {
             super(itemView);
             description = itemView.findViewById(R.id.mpsdkDescription);
             comment = itemView.findViewById(R.id.mpsdkComment);
-            icon = itemView.findViewById(R.id.mpsdkImage);
             discountInfo = itemView.findViewById(R.id.mpsdkDiscountInfo);
+            icon = itemView.findViewById(R.id.mpsdkImage);
+            badge = itemView.findViewById(R.id.mpsdkIconBadge);
         }
 
         void populate(@NonNull final PaymentMethodViewModel model) {
@@ -72,8 +72,8 @@ public class PaymentMethodSearchItemAdapter extends RecyclerView.Adapter<Payment
             ViewUtils.loadOrGone(model.getComment(), comment);
             ViewUtils.loadOrGone(model.getIconResourceId(context), icon);
             ViewUtils.loadOrGone(model.getDiscountInfo(), discountInfo);
+            ViewUtils.loadOrGone(model.getBadgeResourceId(context), badge);
             model.tint(icon);
-
             itemView.setOnClickListener(v -> model.handleOnClick());
         }
 

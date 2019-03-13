@@ -47,6 +47,7 @@ public class PaymentServiceTest {
     @Mock private PluginRepository pluginRepository;
     @Mock private UserSelectionRepository userSelectionRepository;
     @Mock private PaymentSettingRepository paymentSettingRepository;
+    @Mock private DisabledPaymentMethodService disabledPaymentMethodService;
     @Mock private DiscountRepository discountRepository;
     @Mock private AmountRepository amountRepository;
     @Mock private SplitPaymentProcessor paymentProcessor;
@@ -72,6 +73,7 @@ public class PaymentServiceTest {
     public void setUp() {
         paymentService = new PaymentService(userSelectionRepository,
             paymentSettingRepository,
+            disabledPaymentMethodService,
             pluginRepository,
             discountRepository,
             amountRepository,

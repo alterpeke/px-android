@@ -2,10 +2,11 @@ package com.mercadopago.android.px.internal.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Typeface;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -271,4 +272,10 @@ public final class ViewUtils {
         }
     }
 
+    public static void grayScaleView(@NonNull final ImageView targetView){
+        final ColorMatrix matrix = new ColorMatrix();
+        matrix.setSaturation(0);
+        final ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+        targetView.setColorFilter(filter);
+    }
 }

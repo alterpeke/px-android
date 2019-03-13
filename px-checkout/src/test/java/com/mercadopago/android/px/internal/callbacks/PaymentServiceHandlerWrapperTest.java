@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.callbacks;
 
+import com.mercadopago.android.px.internal.datasource.DisabledPaymentMethodService;
 import com.mercadopago.android.px.internal.repository.EscManager;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -19,7 +20,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,6 +31,7 @@ public class PaymentServiceHandlerWrapperTest {
 
     @Mock private PaymentServiceHandler wrapped;
     @Mock private PaymentRepository paymentRepository;
+    @Mock private DisabledPaymentMethodService disabledPaymentMethodService;
     @Mock private PaymentRecovery paymentRecovery;
     @Mock private InstructionsRepository instructionsRepository;
     @Mock private EscManager escManager;
@@ -39,8 +40,9 @@ public class PaymentServiceHandlerWrapperTest {
 
     @Before
     public void setUp() {
-        paymentServiceHandlerWrapper = new PaymentServiceHandlerWrapper(paymentRepository, escManager,
-            instructionsRepository);
+        paymentServiceHandlerWrapper =
+            new PaymentServiceHandlerWrapper(paymentRepository, disabledPaymentMethodService, escManager,
+                instructionsRepository);
         paymentServiceHandlerWrapper.setHandler(wrapped);
         when(paymentRepository.createRecoveryForInvalidESC()).thenReturn(paymentRecovery);
         when(paymentRepository.getPaymentDataList()).thenReturn(Collections.singletonList(mock(PaymentData.class)));
@@ -98,7 +100,8 @@ public class PaymentServiceHandlerWrapperTest {
     @Test
     public void whenPaymentFinishedWithBusinessVerifyEscManaged() {
         final BusinessPayment payment = mock(BusinessPayment.class);
-
+        final PaymentResult paymentResult = mock(PaymentResult.class);
+        when(paymentRepository.createPaymentResult(payment)).thenReturn(paymentResult);
 
         final IPaymentDescriptorHandler handler = paymentServiceHandlerWrapper.getHandler();
         handler.visit(payment);
@@ -107,6 +110,8 @@ public class PaymentServiceHandlerWrapperTest {
             payment.getPaymentStatusDetail());
 
         verify(paymentRepository).storePayment(payment);
+
+        verify(paymentRepository).createPaymentResult(payment);
 
         verify(paymentRepository, times(2)).getPaymentDataList();
         verify(wrapped).onPaymentFinished(payment);

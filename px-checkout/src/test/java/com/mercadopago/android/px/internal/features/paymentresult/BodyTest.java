@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.paymentresult;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import com.mercadopago.android.px.model.PaymentResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import static org.mockito.Mockito.mock;
 
@@ -78,7 +80,7 @@ public class BodyTest {
         final Body body = new Body(getBodyPropsForOnPayment(paymentResult),
             dispatcher);
 
-        Assert.assertTrue(body.hasBodyError());
+        Assert.assertFalse(body.hasBodyError());
     }
 
     @Test

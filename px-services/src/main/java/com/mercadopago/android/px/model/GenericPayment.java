@@ -4,16 +4,21 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.mercadopago.android.px.model.internal.IParcelablePaymentDescriptor;
+
+import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
 
 @SuppressWarnings("unused")
 @Deprecated
 public final class GenericPayment implements IPayment, Parcelable {
 
-    @Nullable public final Long id;
-    @NonNull public final String status;
-    @NonNull public final String statusDetail;
-    @Nullable public final String statementDescription;
+    @Nullable
+    public final Long id;
+    @NonNull
+    public final String status;
+    @NonNull
+    public final String statusDetail;
+    @Nullable
+    public final String statementDescription;
 
     private GenericPayment(final Builder builder) {
         id = builder.paymentId;
@@ -41,7 +46,7 @@ public final class GenericPayment implements IPayment, Parcelable {
         @NonNull final String statusDetail) {
         id = paymentId;
         this.status = status;
-        this.statusDetail = processStatusDetail(status, statusDetail);
+        this.statusDetail = processStatusDetail(statusDetail);
         statementDescription = null;
     }
 
@@ -52,33 +57,8 @@ public final class GenericPayment implements IPayment, Parcelable {
         @NonNull final String statementDescription) {
         id = paymentId;
         this.status = status;
-        this.statusDetail = processStatusDetail(status, statusDetail);
+        this.statusDetail = processStatusDetail(statusDetail);
         this.statementDescription = statementDescription;
-    }
-
-    /**
-     * Resolve the status type, it transforms a generic status and detail into a known status detail {@link
-     * Payment.StatusDetail }
-     *
-     * @param status the payment status type
-     * @param statusDetail the payment detail type
-     * @return an status detail type
-     */
-    private String processStatusDetail(@NonNull final String status, @NonNull final String statusDetail) {
-
-        if (Payment.StatusCodes.STATUS_APPROVED.equals(status)) {
-            return Payment.StatusDetail.STATUS_DETAIL_APPROVED_PLUGIN_PM;
-        }
-
-        if (Payment.StatusCodes.STATUS_REJECTED.equals(status)) {
-            if (Payment.StatusDetail.isKnownErrorDetail(statusDetail)) {
-                return statusDetail;
-            } else {
-                return Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_PLUGIN_PM;
-            }
-        }
-
-        return statusDetail;
     }
 
     @Nullable
@@ -122,6 +102,14 @@ public final class GenericPayment implements IPayment, Parcelable {
         return 0;
     }
 
+    /**
+     * Checks whether is a known error detail or should fallback with a default
+     * @param statusDetail status detail to process
+     */
+    private String processStatusDetail(final String statusDetail) {
+        return Payment.StatusDetail.isKnownStatusDetail(statusDetail) ? statusDetail : unknownStatusDetailFallback();
+    }
+
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
         if (id == null) {
@@ -160,5 +148,9 @@ public final class GenericPayment implements IPayment, Parcelable {
         public GenericPayment createGenericPayment() {
             return new GenericPayment(this);
         }
+    }
+
+    private static String unknownStatusDetailFallback() {
+        return STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
     }
 }

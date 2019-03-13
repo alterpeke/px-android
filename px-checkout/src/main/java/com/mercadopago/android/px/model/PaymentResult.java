@@ -119,6 +119,10 @@ public class PaymentResult implements Serializable {
             getPaymentStatus().equals(Payment.StatusCodes.STATUS_IN_PROCESS);
     }
 
+    public String getPaymentMethodId() {
+        return paymentMethodId;
+    }
+
     public static final class Builder {
 
         /* default */ PaymentData paymentData;

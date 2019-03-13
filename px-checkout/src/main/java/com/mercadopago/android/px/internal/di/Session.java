@@ -270,6 +270,7 @@ public final class Session extends ApplicationModule
                 getConfigurationModule().getPaymentSettings().getPaymentConfiguration().getPaymentProcessor();
             paymentRepository = new PaymentService(configurationModule.getUserSelectionRepository(),
                 configurationModule.getPaymentSettings(),
+                configurationModule.getDisabledPaymentMethodRepository(),
                 getPluginRepository(),
                 getDiscountRepository(), getAmountRepository(),
                 paymentProcessor,

@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.features.paymentresult.components;
 
 import android.support.annotation.NonNull;
+import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.paymentresult.props.BodyErrorProps;
 import com.mercadopago.android.px.internal.features.paymentresult.props.InstructionsProps;
 import com.mercadopago.android.px.internal.features.paymentresult.props.PaymentResultBodyProps;
@@ -9,8 +10,8 @@ import com.mercadopago.android.px.internal.view.CompactComponent;
 import com.mercadopago.android.px.internal.view.Component;
 import com.mercadopago.android.px.internal.view.PaymentMethodBodyComponent;
 import com.mercadopago.android.px.internal.view.Receipt;
+import com.mercadopago.android.px.internal.viewmodel.PaymentResultViewModel;
 import com.mercadopago.android.px.model.ExternalFragment;
-import com.mercadopago.android.px.model.Payment;
 
 public class Body extends Component<PaymentResultBodyProps, Void> {
 
@@ -31,24 +32,15 @@ public class Body extends Component<PaymentResultBodyProps, Void> {
     }
 
     public boolean hasBodyError() {
-        return props.paymentResult.getPaymentStatus() != null
-            && props.paymentResult.getPaymentStatusDetail() != null
-            && (isPendingWithBody() || isRejectedWithBody());
-    }
-
-    private boolean isPendingWithBody() {
-        return (Payment.StatusCodes.STATUS_PENDING.equals(props.paymentResult.getPaymentStatus())
-            || Payment.StatusCodes.STATUS_IN_PROCESS.equals(props.paymentResult.getPaymentStatus()))
-            && Payment.StatusDetail.isPendingWithDetail(props.paymentResult.getPaymentStatusDetail());
-    }
-
-    private boolean isRejectedWithBody() {
-        return Payment.StatusCodes.STATUS_REJECTED.equals(props.paymentResult.getPaymentStatus()) &&
-            Payment.StatusDetail.isRejectedWithDetail(props.paymentResult.getPaymentStatusDetail());
+        final PaymentResultViewModel paymentResultViewModel =
+            PaymentResultViewModelFactory.createPaymentResultViewModel(props.paymentResult);
+        return paymentResultViewModel.hasBodyError();
     }
 
     /* default */ boolean isStatusApproved() {
-        return Payment.StatusCodes.STATUS_APPROVED.equals(props.paymentResult.getPaymentStatus());
+        final PaymentResultViewModel paymentResultViewModel =
+            PaymentResultViewModelFactory.createPaymentResultViewModel(props.paymentResult);
+        return paymentResultViewModel.isApprovedSuccess();
     }
 
     public BodyError getBodyErrorComponent() {
@@ -56,6 +48,7 @@ public class Body extends Component<PaymentResultBodyProps, Void> {
             .setStatus(props.paymentResult.getPaymentStatus())
             .setStatusDetail(props.paymentResult.getPaymentStatusDetail())
             .setPaymentMethodName(props.paymentResult.getPaymentData().getPaymentMethod().getName())
+            .setPaymentAmount(props.paymentResult.getPaymentData().getTransactionAmount().toBigInteger())
             .build();
         return new BodyError(bodyErrorProps, getDispatcher());
     }

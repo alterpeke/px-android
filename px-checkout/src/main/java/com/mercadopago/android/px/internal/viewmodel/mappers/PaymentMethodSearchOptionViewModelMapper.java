@@ -26,13 +26,13 @@ public class PaymentMethodSearchOptionViewModelMapper
     public PaymentMethodViewModel map(@NonNull final PaymentMethodSearchItem val) {
         return new PaymentMethodViewModel() {
             @Override
-            public String getDescription() {
-                return val.getDescription();
+            public String getPaymentMethodId() {
+                return val.getId();
             }
 
             @Override
-            public String getPaymentMethodId() {
-                return val.getId();
+            public String getDescription() {
+                return val.getDescription();
             }
 
             @Override
@@ -63,6 +63,16 @@ public class PaymentMethodSearchOptionViewModelMapper
                 } else {
                     return 0;
                 }
+            }
+
+            @Override
+            public int getBadgeResourceId(@NonNull final Context context) {
+                return 0;
+            }
+
+            @Override
+            public boolean isDisabled() {
+                return false;
             }
 
             @Override
