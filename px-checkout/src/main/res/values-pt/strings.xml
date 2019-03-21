@@ -112,17 +112,19 @@
     <string name="px_title_other_reason_rejection">Não foi possível processar o seu pagamento</string>
     <string name="px_title_duplicated_reason_rejection">Desculpe, o pagamento foi feito duas vezes, por isso recusamos a segunda vez</string>
     <string name="px_title_bad_filled_other">Algum dado do cartão está incorreto</string>
-    <string name="px_text_how_can_authorize">Como o autorizo?</string>
+    <string name="px_text_how_can_authorize">Como posso autorizá-lo?</string>
     <string name="px_text_some_card_data_is_incorrect">Algum dado do cartão está incorreto</string>
     <string name="px_text_insufficient_amount">Não há limite suficiente no seu cartão</string>
     <string name="px_text_active_card">Seu cartão não está desbloqueado</string>
     <string name="px_title_rejection_high_risk">Recusamos seu pagamento</string>
+    <string name="px_title_rejection_account_high_risk">Você não pode usar seu dinheiro no Mercado Pago para este pagamento</string>
     <string name="px_title_rejection_max_attempts">Recusamos o pagamento porque você atingiu o limite de tentativas</string>
     <string name="px_title_rejection_blacklist">Recusamos seu pagamento com este cartão</string>
     <string name="px_title_rejection_fraud">Você está suspenso para pagar</string>
     <string name="px_rejection_label">Algo deu errado…</string>
     <string name="px_text_card_data_invalid">Revisar os dados do cartão</string>
     <string name="px_error_description_call">1- Ligue para o telefone no verso do seu cartão para autorizar o pagamento para o Mercado Pago. \n 2- Por favor, avise-nos para que possamos creditá-lo.</string>
+    <string name="px_error_bad_filled_action">Inserir os dados do cartão novamente</string>
     <string name="px_error_description_card_disabled">Ligue para o %1$s para desbloquear seu cartão ou use outro meio de pagamento.</string>
     <string name="px_error_description_other_reason">Use outro cartão ou outro meio de pagamento.</string>
     <string name="px_error_description_by_bank">Por favor, tente pagar de outra forma.</string>
@@ -131,7 +133,7 @@
     <string name="px_error_description_max_attempts">Como você atingiu o limite de tentativas com este cartão, por favor, use outro meio de pagamento.</string>
     <string name="px_error_description_high_risk">Tente pagar com outro meio.</string>
     <string name="px_error_description_rejected_by_regulations">Para pagar com dinheiro em conta, você deve preencher os dados faltantes.</string>
-    <string name="px_text_card_enabled">Eu já habilitei meu cartão</string>
+    <string name="px_text_card_enabled">Já desbloqueei o cartão </string>
 
     <!-- Error messages -->
     <string name="px_error_message_invalid_item">Item inválido</string>

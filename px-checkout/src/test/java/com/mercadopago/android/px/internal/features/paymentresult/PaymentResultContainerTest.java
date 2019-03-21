@@ -156,7 +156,7 @@ public class PaymentResultContainerTest {
             .setPaymentData(paymentData)
             .build();
         final HeaderProps headerProps = getHeaderPropsFromContainerWith(paymentResult);
-        Assert.assertEquals(headerProps.background, R.color.px_colorPrimary);
+        Assert.assertEquals(headerProps.background, R.color.ui_components_error_color);
     }
 
     @Test
@@ -375,7 +375,7 @@ public class PaymentResultContainerTest {
             .setPaymentData(paymentData)
             .build();
         final HeaderProps headerProps = getHeaderPropsFromContainerWith(paymentResult);
-        Assert.assertEquals(headerProps.badgeImage, PaymentResultContainer.DEFAULT_BADGE_IMAGE);
+        Assert.assertEquals(headerProps.badgeImage, PaymentResultContainer.ERROR_BADGE_IMAGE);
     }
 
 //    @Test

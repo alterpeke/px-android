@@ -117,7 +117,7 @@
     <string name="px_pending_label">Hurry to pay!</string>
 
     <!-- Rejection -->
-    <string name="px_text_pay_with_other_method">Change payment method</string>
+    <string name="px_text_pay_with_other_method">Pay using a different method</string>
     <string name="px_title_other_reason_rejection">We could not process your payment</string>
     <string name="px_title_duplicated_reason_rejection">We are sorry, the payment was made twice, therefore we rejected the second one.</string>
     <string name="px_title_bad_filled_other">One of the card\'s details is invalid</string>
@@ -126,11 +126,13 @@
     <string name="px_text_insufficient_amount">Your card does not have sufficient funds</string>
     <string name="px_text_active_card">Your card is not activated</string>
     <string name="px_title_rejection_high_risk">We rejected your payment</string>
+    <string name="px_title_rejection_account_high_risk">You cannot use your money in Mercado Pago for this payment</string>
     <string name="px_title_rejection_max_attempts">We rejected this payment because you reached the limit of attempts</string>
     <string name="px_title_rejection_blacklist">We rejected the payment with this card</string>
     <string name="px_title_rejection_fraud">You are suspended for payments</string>
     <string name="px_rejection_label">Something went wrong…</string>
     <string name="px_error_description_call">1- Call the phone number on the back of your card to authorize the payment to Mercado Pago. \n 2- Please let us know so that we can credit it.</string>
+    <string name="px_error_bad_filled_action">Enter the card details again</string>
     <string name="px_error_description_card_disabled">Call %1$s to activate your card or use a different payment method</string>
     <string name="px_error_description_other_reason">Use another card or other payment method.</string>
     <string name="px_error_description_by_bank">Please try to pay with other payment method.</string>
@@ -208,7 +210,7 @@
     <string name="px_got_it">Got it</string>
 
     <!-- Review and Confirm -->
-    <string name="px_change_payment">Change payment method</string>
+    <string name="px_change_payment">Pay using a different method</string>
     <string name="px_add_new_card">Add new card</string>
     <string name="px_your_atm">ATM of</string>
     <string name="px_review_off_text_default">You will pay %1$s\n%2$s</string>

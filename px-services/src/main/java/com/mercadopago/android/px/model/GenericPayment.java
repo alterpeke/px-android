@@ -5,9 +5,7 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.mercadopago.android.px.model.internal.IParcelablePaymentDescriptor;
-
-import static com.mercadopago.android.px.model.Payment.StatusDetail.unknownStatusDetailFallback;
+import static com.mercadopago.android.px.model.Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
 
 @SuppressWarnings("unused")
 @Deprecated
@@ -109,7 +107,7 @@ public final class GenericPayment implements IPayment, Parcelable {
      * @param statusDetail status detail to process
      */
     private String processStatusDetail(final String statusDetail) {
-        return Payment.StatusDetail.isKnownErrorDetail(statusDetail) ? statusDetail : unknownStatusDetailFallback();
+        return Payment.StatusDetail.isKnownStatusDetail(statusDetail) ? statusDetail : unknownStatusDetailFallback();
     }
 
     @Override
@@ -150,5 +148,9 @@ public final class GenericPayment implements IPayment, Parcelable {
         public GenericPayment createGenericPayment() {
             return new GenericPayment(this);
         }
+    }
+
+    private static String unknownStatusDetailFallback() {
+        return STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
     }
 }
