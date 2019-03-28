@@ -47,6 +47,7 @@ import com.mercadopago.android.px.internal.features.express.slider.SummaryViewAd
 import com.mercadopago.android.px.internal.features.express.slider.TitlePagerAdapter;
 import com.mercadopago.android.px.internal.features.plugins.PaymentProcessorActivity;
 import com.mercadopago.android.px.internal.util.ApiUtil;
+import com.mercadopago.android.px.internal.util.FragmentUtil;
 import com.mercadopago.android.px.internal.util.ScaleUtil;
 import com.mercadopago.android.px.internal.util.StatusBarDecorator;
 import com.mercadopago.android.px.internal.util.VibrationUtils;
@@ -447,9 +448,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
 
     @Override
     public void finishLoading(@NonNull final ExplodeDecorator params) {
-        final FragmentManager childFragmentManager = getChildFragmentManager();
-        final Fragment fragment = childFragmentManager.findFragmentByTag(TAG_EXPLODING_FRAGMENT);
-        if (fragment != null && fragment.isAdded() && fragment.isVisible() && fragment instanceof ExplodingFragment) {
+        final Fragment fragment = FragmentUtil.getFragmentByTag(getChildFragmentManager(), TAG_EXPLODING_FRAGMENT);
+        if (fragment != null) {
             ((ExplodingFragment) fragment).finishLoading(params);
         } else {
             presenter.hasFinishPaymentAnimation();
@@ -461,8 +461,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         showConfirmButton();
         final FragmentManager childFragmentManager = getChildFragmentManager();
         final ExplodingFragment fragment =
-            (ExplodingFragment) childFragmentManager.findFragmentByTag(TAG_EXPLODING_FRAGMENT);
-        if (fragment != null && fragment.isAdded() && fragment.hasFinished()) {
+            (ExplodingFragment) FragmentUtil.getFragmentByTag(childFragmentManager, TAG_EXPLODING_FRAGMENT);
+        if (fragment != null && fragment.hasFinished()) {
             childFragmentManager
                 .beginTransaction()
                 .remove(fragment)
@@ -589,5 +589,10 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     @Override
     public void onAnimationFinished() {
         presenter.hasFinishPaymentAnimation();
+    }
+
+    @Override
+    public boolean isExploding() {
+        return FragmentUtil.isFragmentVisible(getChildFragmentManager(), TAG_EXPLODING_FRAGMENT);
     }
 }

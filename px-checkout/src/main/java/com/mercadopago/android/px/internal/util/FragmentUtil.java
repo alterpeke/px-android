@@ -5,6 +5,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -33,6 +34,19 @@ public final class FragmentUtil {
         } else {
             throw new IllegalArgumentException("Container context is not a activity");
         }
+    }
+
+    @Nullable
+    public static Fragment getFragmentByTag(@NonNull final FragmentManager manager, @NonNull final String tag) {
+        final Fragment fragment = manager.findFragmentByTag(tag);
+        if (fragment != null && fragment.isAdded() && fragment.isVisible()) {
+            return fragment;
+        }
+        return null;
+    }
+
+    public static boolean isFragmentVisible(@NonNull final FragmentManager manager, @NonNull final String tag) {
+        return getFragmentByTag(manager, tag) != null;
     }
 
     private static void addFragmentInside(@NonNull final ViewGroup viewGroup,

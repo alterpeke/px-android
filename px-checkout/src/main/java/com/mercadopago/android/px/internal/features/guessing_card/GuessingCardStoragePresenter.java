@@ -1,7 +1,9 @@
 package com.mercadopago.android.px.internal.features.guessing_card;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
 import com.mercadopago.android.px.internal.callbacks.TaggedCallback;
 import com.mercadopago.android.px.internal.controllers.PaymentMethodGuessingController;
 import com.mercadopago.android.px.internal.datasource.CardAssociationGatewayService;
@@ -28,7 +30,7 @@ import static com.mercadopago.android.px.internal.util.ApiUtil.RequestOrigin.GET
 public class GuessingCardStoragePresenter extends GuessingCardPresenter {
 
     /* default */ final IESCManager IESCManager;
-    /* default */ final String accessToken;
+    private final MercadoPagoCardStorage mercadoPagoCardStorage;
     private final CardPaymentMethodRepository cardPaymentMethodRepository;
     private final IdentificationRepository identificationRepository;
     private final CardAssociationService cardAssociationService;
@@ -37,14 +39,14 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
     @Nullable
     private PaymentMethod currentPaymentMethod;
 
-    public GuessingCardStoragePresenter(final String accessToken,
+    public GuessingCardStoragePresenter(@NonNull final MercadoPagoCardStorage mercadoPagoCardStorage,
         final CardPaymentMethodRepository cardPaymentMethodRepository,
         final IdentificationRepository identificationRepository,
         final CardAssociationService cardAssociationService,
         final IESCManager IESCManager,
         final CardAssociationGatewayService gatewayService) {
         super();
-        this.accessToken = accessToken;
+        this.mercadoPagoCardStorage = mercadoPagoCardStorage;
         this.cardPaymentMethodRepository = cardPaymentMethodRepository;
         this.identificationRepository = identificationRepository;
         this.cardAssociationService = cardAssociationService;
@@ -89,7 +91,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
 
     @Override
     public void getIdentificationTypesAsync() {
-        identificationRepository.getIdentificationTypes(accessToken).enqueue(
+        identificationRepository.getIdentificationTypes(mercadoPagoCardStorage.getAccessToken()).enqueue(
             new TaggedCallback<List<IdentificationType>>(ApiUtil.RequestOrigin.GET_IDENTIFICATION_TYPES) {
                 @Override
                 public void onSuccess(final List<IdentificationType> identificationTypes) {
@@ -97,7 +99,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                         if (!identificationTypes.isEmpty()) {
                             resolveIdentificationTypes(identificationTypes);
                         } else {
-                            getView().finishCardStorageFlowWithError(accessToken);
+                            finishCardStorageFlowWithError();
                         }
                     }
                 }
@@ -105,7 +107,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                 @Override
                 public void onFailure(final MercadoPagoError error) {
                     if (isViewAttached()) {
-                        getView().finishCardStorageFlowWithError(accessToken);
+                        finishCardStorageFlowWithError();
                     }
                 }
             });
@@ -114,7 +116,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
     @Override
     public void getPaymentMethods() {
         getView().showProgress();
-        cardPaymentMethodRepository.getCardPaymentMethods(accessToken).enqueue(
+        cardPaymentMethodRepository.getCardPaymentMethods(mercadoPagoCardStorage.getAccessToken()).enqueue(
             new TaggedCallback<List<PaymentMethod>>(GET_CARD_PAYMENT_METHODS) {
                 @Override
                 public void onSuccess(final List<PaymentMethod> paymentMethods) {
@@ -125,7 +127,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                                 PaymentMethodGuessingController(paymentMethods, null, null);
                             startGuessingForm();
                         } else {
-                            getView().finishCardStorageFlowWithError(accessToken);
+                            finishCardStorageFlowWithError();
                         }
                     }
                 }
@@ -133,7 +135,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                 @Override
                 public void onFailure(final MercadoPagoError error) {
                     if (isViewAttached()) {
-                        getView().finishCardStorageFlowWithError(accessToken);
+                        finishCardStorageFlowWithError();
                     }
                 }
             }
@@ -142,7 +144,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
 
     @Override
     public void createToken() {
-        gatewayService.createToken(accessToken, cardToken)
+        gatewayService.createToken(mercadoPagoCardStorage.getAccessToken(), cardToken)
             .enqueue(new TaggedCallback<Token>(ApiUtil.RequestOrigin.CREATE_TOKEN) {
                 @Override
                 public void onSuccess(final Token token) {
@@ -150,7 +152,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                         resolveTokenRequest(token);
                     } else {
                         if (isViewAttached()) {
-                            getView().finishCardStorageFlowWithError(accessToken);
+                            finishCardStorageFlowWithError();
                         }
                     }
                 }
@@ -161,7 +163,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                         if (isIdentificationNumberWrong(error)) {
                             showIdentificationNumberError();
                         } else {
-                            getView().finishCardStorageFlowWithError(accessToken);
+                            finishCardStorageFlowWithError();
                         }
                     }
                 }
@@ -192,7 +194,8 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
 
     void associateCardToUser(@Nullable final Long issuerId) {
         cardAssociationService
-            .associateCardToUser(accessToken, getToken().getId(), getPaymentMethod().getId(),
+            .associateCardToUser(mercadoPagoCardStorage.getAccessToken(), getToken().getId(),
+                getPaymentMethod().getId(),
                 issuerId)
             .enqueue(
                 new TaggedCallback<Card>(ApiUtil.RequestOrigin.ASSOCIATE_CARD) {
@@ -202,7 +205,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                             saveCardEsc(card);
                         } else {
                             if (isViewAttached()) {
-                                getView().finishCardStorageFlowWithError(accessToken);
+                                finishCardStorageFlowWithError();
                             }
                         }
                     }
@@ -210,7 +213,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                     @Override
                     public void onFailure(final MercadoPagoError error) {
                         if (isViewAttached()) {
-                            getView().finishCardStorageFlowWithError(accessToken);
+                            finishCardStorageFlowWithError();
                         }
                     }
                 });
@@ -219,7 +222,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
     /* default */ void saveCardEsc(final Card card) {
         final SavedESCCardToken savedESCCardToken =
             SavedESCCardToken.createWithSecurityCode(card.getId(), getCardToken().getSecurityCode());
-        gatewayService.createEscToken(accessToken, savedESCCardToken)
+        gatewayService.createEscToken(mercadoPagoCardStorage.getAccessToken(), savedESCCardToken)
             .enqueue(new TaggedCallback<Token>(CREATE_TOKEN) {
                 @Override
                 public void onSuccess(final Token token) {
@@ -228,21 +231,22 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                     }
 
                     if (isViewAttached()) {
-                        getView().finishCardStorageFlowWithSuccess();
+                        finishCardStorageFlowWithSuccess();
                     }
                 }
 
                 @Override
                 public void onFailure(final MercadoPagoError error) {
                     if (isViewAttached()) {
-                        getView().finishCardStorageFlowWithSuccess();
+                        finishCardStorageFlowWithSuccess();
                     }
                 }
             });
     }
 
     /* default */ void fetchCardIssuers() {
-        cardAssociationService.getCardIssuers(accessToken, getPaymentMethod().getId(), getSavedBin()).enqueue(
+        cardAssociationService
+            .getCardIssuers(mercadoPagoCardStorage.getAccessToken(), getPaymentMethod().getId(), getSavedBin()).enqueue(
             new TaggedCallback<List<Issuer>>(GET_ISSUERS) {
                 @Override
                 public void onSuccess(final List<Issuer> issuers) {
@@ -279,6 +283,22 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
     public void onRestoreInstanceState(final Bundle savedInstanceState) {
         if (savedInstanceState != null && savedInstanceState.getString(PAYMENT_METHOD_BUNDLE) != null) {
             super.onRestoreInstanceState(savedInstanceState);
+        }
+    }
+
+    private void finishCardStorageFlowWithSuccess() {
+        if (mercadoPagoCardStorage.shouldSkipResultScreen()) {
+            getView().finishCardStorageFlowWithSuccess();
+        } else {
+            getView().showSuccessScreen();
+        }
+    }
+
+    private void finishCardStorageFlowWithError() {
+        if (mercadoPagoCardStorage.shouldSkipResultScreen()) {
+            getView().finishCardStorageFlowWithError();
+        } else {
+            getView().showErrorScreen(mercadoPagoCardStorage.getAccessToken());
         }
     }
 }

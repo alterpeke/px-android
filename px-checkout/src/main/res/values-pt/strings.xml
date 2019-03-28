@@ -55,12 +55,14 @@
     <string name="px_invalid_identification_number">Digite todos os números</string>
     <string name="px_invalid_identification_name">Digite seu nome</string>
     <string name="px_invalid_identification_last_name">Digite seu sobrenome</string>
+    <string name="px_invalid_identification_business_name">Digite seu razão social</string>
     <string name="px_invalid_payment_method">Você não pode pagar com este meio de pagamento</string>
     <string name="px_card_number_label">Número do cartão</string>
     <string name="px_card_expire_date_label">Data de validade</string>
     <string name="px_cardholder_name">Nome e sobrenome</string>
     <string name="px_name">Nome</string>
     <string name="px_lastname">Sobrenome</string>
+    <string name="px_business_name">Razão Social</string>
     <string name="px_bank_deals_action">Ver promoções</string>
     <string name="px_security_code">Código de segurança</string>
 
@@ -76,6 +78,7 @@
     <string name="px_card_identification_label">DOCUMENTO DO TITULAR \nDO CARTÃO</string>
     <string name="px_ticket_identification_label">DADOS PARA VALIDAR O SEU PAGAMENTO</string>
     <string name="px_name_and_lastname_identification_label">NOME E SOBRENOME</string>
+    <string name="px_business_name_identification_label">RAZÃO SOCIAL</string>
     <string name="px_card_identification_number">Número</string>
     <string name="px_card_identification_type">Tipo</string>
     <string name="px_cardholder_name_short">NOME SOBRENOME</string>

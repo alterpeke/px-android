@@ -115,7 +115,7 @@ public class GroupsDiskCache implements GroupsCache {
     @Override
     public void evict() {
         if (isCached()) {
-            executorService.execute(new CacheEvict(fileManager, groupsFile));
+            new CacheEvict(fileManager, groupsFile).run();
         }
     }
 

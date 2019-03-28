@@ -63,7 +63,7 @@ public class MercadoPagoUtil {
             accreditationMessage = context.getString(R.string.px_instant_accreditation_time);
         } else {
             StringBuilder accreditationTimeMessageBuilder = new StringBuilder();
-            if (milliseconds > 1440 && milliseconds < 2880) {
+            if (milliseconds >= 1440 && milliseconds < 2880) {
 
                 accreditationTimeMessageBuilder.append(context.getString(R.string.px_accreditation_time));
                 accreditationTimeMessageBuilder.append(" 1 ");

@@ -99,9 +99,13 @@ public interface GuessingCard {
 
         void finishCardFlow();
 
+        void showSuccessScreen();
+
         void finishCardStorageFlowWithSuccess();
 
-        void finishCardStorageFlowWithError(String accessToken);
+        void showErrorScreen(String accessToken);
+
+        void finishCardStorageFlowWithError();
 
         void showProgress();
 

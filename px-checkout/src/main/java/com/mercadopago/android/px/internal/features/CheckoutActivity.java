@@ -12,6 +12,7 @@ import com.mercadopago.android.px.internal.datasource.ReflectiveESCManager;
 import com.mercadopago.android.px.internal.di.ConfigurationModule;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.business_result.BusinessPaymentResultActivity;
+import com.mercadopago.android.px.internal.features.express.ExpressPayment;
 import com.mercadopago.android.px.internal.features.express.ExpressPaymentFragment;
 import com.mercadopago.android.px.internal.features.paymentresult.PaymentResultActivity;
 import com.mercadopago.android.px.internal.features.plugins.PaymentProcessorActivity;
@@ -20,6 +21,7 @@ import com.mercadopago.android.px.internal.features.providers.CheckoutProviderIm
 import com.mercadopago.android.px.internal.features.review_and_confirm.ReviewAndConfirmBuilder;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
+import com.mercadopago.android.px.internal.util.FragmentUtil;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
@@ -145,7 +147,11 @@ public class CheckoutActivity extends PXActivity implements CheckoutView, Expres
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        final ExpressPayment.View fragment =
+            (ExpressPayment.View) FragmentUtil.getFragmentByTag(getSupportFragmentManager(), TAG_ONETAP_FRAGMENT);
+        if (fragment == null || !fragment.isExploding()) {
+            super.onBackPressed();
+        }
     }
 
     protected CheckoutPresenter getActivityParameters() {

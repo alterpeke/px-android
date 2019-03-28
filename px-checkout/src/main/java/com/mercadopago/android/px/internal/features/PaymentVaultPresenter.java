@@ -58,12 +58,12 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
     private AmountRowController amountRowController;
 
     public PaymentVaultPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
-                                 @NonNull final UserSelectionRepository userSelectionRepository,
-                                 @NonNull final PluginRepository pluginService,
-                                 @NonNull final DiscountRepository discountRepository,
-                                 @NonNull final GroupsRepository groupsRepository,
-                                 @NonNull final IESCManager IESCManager,
-                                 @NonNull final PaymentVaultTitleSolver titleSolver) {
+        @NonNull final UserSelectionRepository userSelectionRepository,
+        @NonNull final PluginRepository pluginService,
+        @NonNull final DiscountRepository discountRepository,
+        @NonNull final GroupsRepository groupsRepository,
+        @NonNull final IESCManager IESCManager,
+        @NonNull final PaymentVaultTitleSolver titleSolver) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.userSelectionRepository = userSelectionRepository;
         pluginRepository = pluginService;
@@ -98,7 +98,8 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
             @Override
             public void failure(final ApiException apiException) {
                 getView()
-                    .showError(MercadoPagoError.createNotRecoverable(apiException, ApiException.ErrorCodes.PAYMENT_METHOD_NOT_FOUND),
+                    .showError(MercadoPagoError
+                            .createNotRecoverable(apiException, ApiException.ErrorCodes.PAYMENT_METHOD_NOT_FOUND),
                         ApiException.ErrorCodes.PAYMENT_METHOD_NOT_FOUND);
                 setFailureRecovery(new FailureRecovery() {
                     @Override
@@ -130,8 +131,8 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
     @Override
     public void showAmountRow() {
         getView().showAmount(discountRepository.getCurrentConfiguration(),
-                paymentSettingRepository.getCheckoutPreference().getTotalAmount(),
-                paymentSettingRepository.getCheckoutPreference().getSite());
+            paymentSettingRepository.getCheckoutPreference().getTotalAmount(),
+            paymentSettingRepository.getCheckoutPreference().getSite());
     }
 
     @Override
@@ -205,11 +206,11 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
 
     private void selectItem(final PaymentMethodSearchItem item, final Boolean automaticSelection) {
         userSelectionRepository.select((Card) null, null);
-
+        getView().saveAutomaticSelection(automaticSelection);
         if (item.hasChildren()) {
             getView().showSelectedItem(item);
         } else if (item.isPaymentType()) {
-            startNextStepForPaymentType(item, automaticSelection);
+            startNextStepForPaymentType(item);
         } else if (item.isPaymentMethod()) {
             resolvePaymentMethodSelection(item);
         }
@@ -279,13 +280,12 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
         return selectedCard;
     }
 
-    private void startNextStepForPaymentType(final PaymentMethodSearchItem item, final boolean automaticSelection) {
-
+    private void startNextStepForPaymentType(final PaymentMethodSearchItem item) {
         final String itemId = item.getId();
 
         if (PaymentTypes.isCardPaymentType(itemId)) {
-                userSelectionRepository.select(itemId);
-                getView().startCardFlow(automaticSelection);
+            userSelectionRepository.select(itemId);
+            getView().startCardFlow();
         } else {
             getView().startPaymentMethodsSelection(
                 paymentSettingRepository.getCheckoutPreference().getPaymentPreference());
@@ -356,7 +356,7 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
 
     public void trackScreen() {
         // Do not remove check paymentMethodSearch, sometimes in recovery status is null.
-        if(paymentMethodSearch != null) {
+        if (paymentMethodSearch != null) {
             if (selectedSearchItem == null) {
                 trackInitialScreen();
             } else {

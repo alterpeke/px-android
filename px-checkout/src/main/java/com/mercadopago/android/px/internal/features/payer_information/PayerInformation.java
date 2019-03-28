@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.features.payer_information;
 
+import android.support.annotation.NonNull;
 import com.mercadopago.android.px.internal.base.MvpView;
 import com.mercadopago.android.px.internal.viewmodel.PayerInformationStateModel;
 import com.mercadopago.android.px.model.IdentificationType;
@@ -18,6 +19,8 @@ public interface PayerInformation {
 
         void clearErrorLastName();
 
+        void clearErrorBusinessName();
+
         void showErrorIdentificationNumber();
 
         void showErrorName();
@@ -34,6 +37,8 @@ public interface PayerInformation {
 
         void showIdentificationNameFocus();
 
+        void showIdentificationBusinessNameFocus();
+
         void requestIdentificationNumberFocus();
 
         void showError(MercadoPagoError error, String requestOrigin);
@@ -47,7 +52,7 @@ public interface PayerInformation {
 
         void showMissingIdentificationTypesError();
 
-        void showInvalidIdentificationNumberErrorView();
+        void showInvalidLengthIdentificationNumberErrorView();
 
         void showInvalidIdentificationNameErrorView();
 
@@ -61,12 +66,22 @@ public interface PayerInformation {
 
         void identificationDraw();
 
-        void showInvalidCpfNumberErrorView();
+        void showInvalidIdentificationBusinessNameErrorView();
+
+        void showErrorBusinessName();
+
+        void configureCnpjFlow();
+
+        void configureCpfFlow();
+
+        void showInvalidIdentificationNumberErrorView();
     }
 
     interface Actions {
 
         void validateName();
+
+        void validateBusinessName();
 
         void validateLastName();
 
@@ -85,5 +100,7 @@ public interface PayerInformation {
         PayerInformationStateModel getState();
 
         void focus(final String currentFocusType);
+
+        void configureIdentificationTypeFlow(@NonNull IdentificationType identificationType);
     }
 }

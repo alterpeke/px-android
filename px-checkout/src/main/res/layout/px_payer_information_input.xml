@@ -14,4 +14,6 @@
 
     <include layout="@layout/px_form_lastname_input"/>
 
+    <include layout="@layout/px_form_business_name_input"/>
+
 </LinearLayout>

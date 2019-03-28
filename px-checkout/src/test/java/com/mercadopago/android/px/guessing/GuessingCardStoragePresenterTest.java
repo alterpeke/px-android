@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.guessing;
 
 import android.support.annotation.NonNull;
+import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
 import com.mercadopago.android.px.internal.datasource.CardAssociationGatewayService;
 import com.mercadopago.android.px.internal.datasource.CardAssociationService;
 import com.mercadopago.android.px.internal.datasource.IESCManager;
@@ -66,9 +67,11 @@ public class GuessingCardStoragePresenterTest {
     @Mock private GuessingCard.View view;
     @Mock private CardService cardService;
     @Mock private final CardAssociationService cardAssociationService = new CardAssociationService(cardService);
+    @Mock private MercadoPagoCardStorage mercadoPagoCardStorage;
 
     @Before
     public void setUp() {
+        when(mercadoPagoCardStorage.getAccessToken()).thenReturn(DUMMY_ACCESS_TOKEN);
         presenter = getPresenter();
         whenGetIdentificationTypesAsync();
     }
@@ -77,7 +80,8 @@ public class GuessingCardStoragePresenterTest {
     private GuessingCardStoragePresenter getBasePresenter(
         final GuessingCard.View view) {
         final GuessingCardStoragePresenter presenter =
-            new GuessingCardStoragePresenter(DUMMY_ACCESS_TOKEN, cardPaymentMethodRepository, identificationRepository,
+            new GuessingCardStoragePresenter(mercadoPagoCardStorage, cardPaymentMethodRepository,
+                identificationRepository,
                 cardAssociationService,
                 IESCManager, cardAssociationGatewayService);
 
@@ -106,7 +110,7 @@ public class GuessingCardStoragePresenterTest {
             new StubSuccessMpCall<>(emptyList));
 
         presenter.initialize();
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -116,7 +120,7 @@ public class GuessingCardStoragePresenterTest {
             new StubSuccessMpCall<>(nullList));
 
         presenter.initialize();
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -125,7 +129,7 @@ public class GuessingCardStoragePresenterTest {
             new StubFailMpCall<List<PaymentMethod>>(PaymentMethods.getDoNotFindPaymentMethodsException()));
 
         presenter.initialize();
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -227,7 +231,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.resolvePaymentMethodListSet(mockedGuessedPaymentMethods, Cards.MOCKED_BIN_VISA);
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -247,7 +251,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.resolvePaymentMethodListSet(mockedGuessedPaymentMethods, Cards.MOCKED_BIN_VISA);
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -262,7 +266,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -276,7 +280,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -321,7 +325,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
@@ -384,11 +388,11 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(view).finishCardStorageFlowWithError(DUMMY_ACCESS_TOKEN);
+        verify(view).showErrorScreen(DUMMY_ACCESS_TOKEN);
     }
 
     @Test
-    public void whenAssociateCardSucceedesThenSaveEscAndFinishWithSuccess() {
+    public void whenAssociateCardSucceedesThenSaveEscAndShowSuccessScreen() {
 
         initializePresenterWithValidCardPaymentMethods();
         final List<PaymentMethod> mockedGuessedPaymentMethods = new ArrayList<>();
@@ -424,7 +428,7 @@ public class GuessingCardStoragePresenterTest {
     }
 
     @Test
-    public void whenSaveEscFailsThenFinishWithSuccessAnyway() {
+    public void whenSaveEscFailsThenShowSuccessScreenAnyway() {
 
         initializePresenterWithValidCardPaymentMethods();
         final List<PaymentMethod> mockedGuessedPaymentMethods = new ArrayList<>();
@@ -502,5 +506,55 @@ public class GuessingCardStoragePresenterTest {
 
         when(identificationRepository.getIdentificationTypes(anyString())).thenReturn(new StubSuccessMpCall<>
             (identificationTypes));
+    }
+
+    @Test
+    public void whenErrorProducedThenFinishFlowSkippingErrorScreen() {
+        final List<PaymentMethod> emptyList = Collections.emptyList();
+        when(cardPaymentMethodRepository.getCardPaymentMethods(anyString())).thenReturn(
+            new StubSuccessMpCall<>(emptyList));
+
+        when(mercadoPagoCardStorage.shouldSkipResultScreen()).thenReturn(true);
+
+        presenter.initialize();
+        verify(view).finishCardStorageFlowWithError();
+    }
+
+    @Test
+    public void whenNormalFlowFinishedThenFinishFlowSkippingSuccessScreen() {
+
+        initializePresenterWithValidCardPaymentMethods();
+        final List<PaymentMethod> mockedGuessedPaymentMethods = new ArrayList<>();
+        mockedGuessedPaymentMethods.add(PaymentMethods.getPaymentMethodOnVisa());
+
+        final Issuer dummyIssuer = new Issuer(1L, "Dummy Issuer");
+        mockIssuers(Collections.singletonList(dummyIssuer), mockedGuessedPaymentMethods.get(0).getId());
+
+        when(mercadoPagoCardStorage.shouldSkipResultScreen()).thenReturn(true);
+
+        presenter.resolvePaymentMethodListSet(mockedGuessedPaymentMethods, Cards.MOCKED_BIN_VISA);
+
+        final Token token = new Token();
+        token.setId(DUMMY_TOKEN_ID);
+        token.setCardId(DUMMY_CARD_ID);
+        token.setEsc(DUMMY_TOKEN_ESC);
+
+        final Card stubCard = new Card();
+
+        when(cardAssociationGatewayService.createToken(eq(DUMMY_ACCESS_TOKEN), any(CardToken.class)))
+            .thenReturn(new StubSuccessMpCall<>(token));
+
+        when(cardAssociationService
+            .associateCardToUser(DUMMY_ACCESS_TOKEN, DUMMY_TOKEN_ID, mockedGuessedPaymentMethods.get(0).getId(),
+                dummyIssuer.getId()))
+            .thenReturn(new StubSuccessMpCall<>(stubCard));
+
+        when(cardAssociationGatewayService.createEscToken(eq(DUMMY_ACCESS_TOKEN), any(SavedESCCardToken.class)))
+            .thenReturn(new StubSuccessMpCall<>(token));
+
+        presenter.createToken();
+
+        verify(IESCManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
+        verify(view).finishCardStorageFlowWithSuccess();
     }
 }

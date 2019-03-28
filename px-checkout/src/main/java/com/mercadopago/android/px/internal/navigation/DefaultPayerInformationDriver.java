@@ -2,11 +2,12 @@ package com.mercadopago.android.px.internal.navigation;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.mercadopago.android.px.internal.util.IdentificationUtils;
+import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.model.Identification;
 import com.mercadopago.android.px.model.Payer;
 import com.mercadopago.android.px.model.PaymentMethod;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
 public class DefaultPayerInformationDriver {
     @Nullable private final Payer payer;
@@ -39,15 +40,24 @@ public class DefaultPayerInformationDriver {
 
     private boolean isPayerInformationValid(@Nullable final Payer payer) {
         return payer != null
-            && !(!isIdentificationValid(payer.getIdentification())
-            || StringUtils.isEmpty(payer.getFirstName())
-            || StringUtils.isEmpty(payer.getLastName()));
+            && isIdentificationValid(payer.getIdentification())
+            && (isCpfInformationValid(payer)
+            || isCnpjInformationValid(payer));
     }
 
-    private boolean isIdentificationValid(final Identification identification) {
-        return identification != null
-            && !StringUtils.isEmpty(identification.getNumber())
-            && !StringUtils.isEmpty(identification.getType());
+    private boolean isCnpjInformationValid(@NonNull final Payer payer) {
+        //Business name is first name in v1/payments
+        return IdentificationUtils.isCnpj(payer.getIdentification()) && TextUtil.isNotEmpty(payer.getFirstName());
+    }
+
+    private boolean isCpfInformationValid(@NonNull final Payer payer) {
+        return IdentificationUtils.isCpf(payer.getIdentification()) && TextUtil.isNotEmpty(payer.getFirstName())
+            && TextUtil.isNotEmpty(payer.getLastName());
+    }
+
+    private boolean isIdentificationValid(@Nullable final Identification identification) {
+        return identification != null && !TextUtil.isEmpty(identification.getNumber()) &&
+            !TextUtil.isEmpty(identification.getType());
     }
 
     private boolean resolveAdditionalInfo(@NonNull final PaymentMethod selectedPaymentMethod) {
@@ -64,5 +74,4 @@ public class DefaultPayerInformationDriver {
 
         void driveToReviewConfirm();
     }
-
 }

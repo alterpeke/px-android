@@ -15,10 +15,12 @@ public final class PayerInformationStateModel implements Parcelable {
 
     private static final String BUNDLE_PAYER_INFO = "bundle_payer_info";
     private static final String IDENTIFICATION_TYPE_CPF = "CPF";
+    private static final String IDENTIFICATION_TYPE_CNPJ = "CNPJ";
 
     private String identificationNumber;
     private String identificationName;
     private String identificationLastName;
+    private String identificationBusinessName;
     private final Identification identification;
     private IdentificationType identificationType;
     private List<IdentificationType> identificationTypeList;
@@ -32,6 +34,7 @@ public final class PayerInformationStateModel implements Parcelable {
         identificationNumber = in.readString();
         identificationName = in.readString();
         identificationLastName = in.readString();
+        identificationBusinessName = in.readString();
         currentFocusType = in.readString();
         identification = in.readParcelable(Identification.class.getClassLoader());
         identificationType = in.readParcelable(IdentificationType.class.getClassLoader());
@@ -82,13 +85,7 @@ public final class PayerInformationStateModel implements Parcelable {
     }
 
     public void setIdentificationTypes(final List<IdentificationType> identificationTypes) {
-        //TODO do not filter identification types when CNPJ is resolved.
-        identificationTypeList = new ArrayList<>();
-        for (final IdentificationType identificationType : identificationTypes) {
-            if (identificationType.getId().equals(IDENTIFICATION_TYPE_CPF)) {
-                identificationTypeList.add(identificationType);
-            }
-        }
+        identificationTypeList = identificationTypes;
         if (!identificationTypeList.isEmpty()) {
             setIdentificationType(identificationTypeList.get(0));
         }
@@ -111,6 +108,10 @@ public final class PayerInformationStateModel implements Parcelable {
 
     public String getIdentificationLastName() {
         return identificationLastName;
+    }
+
+    public String getIdentificationBusinessName() {
+        return identificationBusinessName;
     }
 
     public Identification getIdentification() {
@@ -144,6 +145,10 @@ public final class PayerInformationStateModel implements Parcelable {
 
     public void setIdentificationLastName(final String identificationLastName) {
         this.identificationLastName = identificationLastName;
+    }
+
+    public void saveIdentificationBusinessName(final String identificationBusinessName) {
+        this.identificationBusinessName = identificationBusinessName;
     }
 
     public void setFocus(final String currentFocusType) {

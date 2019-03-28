@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.google.gson.reflect.TypeToken;
+import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
 import com.mercadopago.android.px.internal.base.BasePresenter;
 import com.mercadopago.android.px.internal.callbacks.FailureRecovery;
 import com.mercadopago.android.px.internal.controllers.PaymentMethodGuessingController;
@@ -119,9 +120,8 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
     }
 
     public static GuessingCardPresenter buildGuessingCardStoragePresenter(final Session session,
-        final CardAssociationSession cardAssociationSession,
-        final String accessToken) {
-        return new GuessingCardStoragePresenter(accessToken, cardAssociationSession.getCardPaymentMethodRepository(),
+        final CardAssociationSession cardAssociationSession, @NonNull final MercadoPagoCardStorage mercadoPagoCardStorage) {
+        return new GuessingCardStoragePresenter(mercadoPagoCardStorage, cardAssociationSession.getCardPaymentMethodRepository(),
             session.getIdentificationRepository(), cardAssociationSession.getCardAssociationService(),
             cardAssociationSession.getMercadoPagoESC(),
             cardAssociationSession.getGatewayService());
@@ -480,7 +480,9 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
                     createToken();
                 }
             });
-            getView().showError(error, requestOrigin);
+            if(isViewAttached()) {
+                getView().showError(error, requestOrigin);
+            }
         }
     }
 
@@ -530,13 +532,31 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
         }
     }
 
-    protected void resolveIdentificationTypes(final List<IdentificationType> identificationTypes) {
-        if (identificationTypes.isEmpty()) {
+    protected void resolveIdentificationTypes(final List<IdentificationType> identificationTypeList) {
+        saveIdentificationTypes(identificationTypeList);
+        //TODO identificationTypes are filtered until new card flow + cnpj is analized.
+        if (identificationTypes == null || identificationTypes.isEmpty()) {
             getView().showMissingIdentificationTypesError(false, ApiUtil.RequestOrigin.GET_IDENTIFICATION_TYPES);
         } else {
-            identificationType = identificationTypes.get(0);
             getView().initializeIdentificationTypes(identificationTypes, identificationType);
-            this.identificationTypes = identificationTypes;
+        }
+    }
+
+    private void saveIdentificationTypes(final List<IdentificationType> identificationTypeList) {
+        identificationTypes = new ArrayList<>();
+
+        if (identificationTypeList == null) {
+            return;
+        }
+
+        for (final IdentificationType identificationType : identificationTypeList) {
+            //TODO Do not filter CNPJ when new card flow + cnpj is analized.
+            if (!IdentificationUtils.isCnpj(identificationType)) {
+                identificationTypes.add(identificationType);
+            }
+        }
+        if (!identificationTypes.isEmpty()) {
+            identificationType = identificationTypeList.get(0);
         }
     }
 

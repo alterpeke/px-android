@@ -26,7 +26,7 @@
             android:layout_height="@dimen/px_m_height"/>
 
         <com.mercadopago.android.px.internal.view.MPTextView
-            android:id="@+id/payer_full_name"
+            android:id="@+id/payer_appellation"
             style="@style/HeaderTitleText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

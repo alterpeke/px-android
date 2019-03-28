@@ -284,7 +284,9 @@ public class GuessingCardPaymentPresenter extends GuessingCardPresenter {
                                 getIssuers();
                             }
                         });
-                        getView().showError(error, ApiUtil.RequestOrigin.GET_ISSUERS);
+                        if(isViewAttached()) {
+                            getView().showError(error, ApiUtil.RequestOrigin.GET_ISSUERS);
+                        }
                     }
                 });
         }

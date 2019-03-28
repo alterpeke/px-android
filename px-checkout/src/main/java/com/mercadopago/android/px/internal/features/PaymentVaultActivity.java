@@ -13,13 +13,14 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.core.PaymentMethodPlugin;
-import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolverImpl;
 import com.mercadopago.android.px.internal.adapters.PaymentMethodSearchItemAdapter;
 import com.mercadopago.android.px.internal.base.PXActivity;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.controllers.CheckoutTimer;
+import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolverImpl;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.payer_information.PayerInformationActivity;
 import com.mercadopago.android.px.internal.features.uicontrollers.FontCache;
@@ -52,6 +53,7 @@ import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.preferences.PaymentPreference;
 import com.mercadopago.android.px.tracking.internal.events.FrictionEventTracker;
 import com.mercadopago.android.px.tracking.internal.views.SelectMethodView;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,6 +69,7 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
     private static final int PAYER_INFORMATION_REQUEST_CODE = 22;
     private static final int REQ_CARD_VAULT = 102;
     private static final String EXTRA_SELECTED_SEARCH_ITEM = "selectedSearchItem";
+    private static final String EXTRA_AUTOMATIC_SELECTION = "automaticSelection";
     private static final String MISMATCHING_PAYMENT_METHOD_ERROR = "Payment method in search not found";
 
     // Local vars
@@ -86,6 +89,7 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
     protected View mProgressLayout;
 
     private AmountView amountView;
+    private boolean automaticSelection;
 
     public static void start(@NonNull final AppCompatActivity from) {
         final Intent intent = new Intent(from, PaymentVaultActivity.class);
@@ -112,7 +116,8 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
             session.getDiscountRepository(),
             session.getGroupsRepository(),
             session.getMercadoPagoESC(),
-            new PaymentVaultTitleSolverImpl(getApplicationContext(), configuration.getAdvancedConfiguration().getCustomStringConfiguration()));
+            new PaymentVaultTitleSolverImpl(getApplicationContext(),
+                configuration.getAdvancedConfiguration().getCustomStringConfiguration()));
 
         getActivityParameters();
         configurePresenter();
@@ -121,8 +126,24 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
         cleanPaymentMethodOptions();
 
         //Avoid automatic selection if activity restored on back pressed from next step
-        initialize();
+        if (savedInstanceState != null) {
+            automaticSelection = savedInstanceState.getBoolean(EXTRA_AUTOMATIC_SELECTION);
+        }
+        if (!automaticSelection) {
+            initialize();
+        }
         validatePaymentConfiguration();
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(EXTRA_AUTOMATIC_SELECTION, automaticSelection);
+    }
+
+    @Override
+    public void saveAutomaticSelection(final boolean automaticSelection) {
+        this.automaticSelection = automaticSelection;
     }
 
     //TODO remove method after session is persisted
@@ -375,7 +396,7 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
     }
 
     private boolean shouldFinishOnBack(final Intent data) {
-        return !Session.getSession(this).getPluginRepository().hasEnabledPaymentMethodPlugin() &&
+        return presenter.getSelectedSearchItem() == null ||
             (presenter.getSelectedSearchItem() != null &&
                 (!presenter.getSelectedSearchItem().hasChildren()
                     || (presenter.getSelectedSearchItem().getChildren().size() == 1))
@@ -444,9 +465,8 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
     }
 
     @Override
-    public void startCardFlow(final Boolean automaticSelection) {
+    public void startCardFlow() {
         new Constants.Activities.CardVaultActivityBuilder()
-            .setAutomaticSelection(automaticSelection)
             .startActivity(this, REQ_CARD_VAULT);
         overrideTransitionIn();
     }

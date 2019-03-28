@@ -38,7 +38,7 @@ public interface PaymentVaultView extends MvpView {
 
     void setTitle(String title);
 
-    void startCardFlow(Boolean automaticallySelection);
+    void startCardFlow();
 
     void startPaymentMethodsSelection(final PaymentPreference paymentPreference);
 
@@ -59,4 +59,6 @@ public interface PaymentVaultView extends MvpView {
     void showEmptyPaymentMethodsError();
 
     void showMismatchingPaymentMethodError();
+
+    void saveAutomaticSelection(final boolean automaticSelection);
 }

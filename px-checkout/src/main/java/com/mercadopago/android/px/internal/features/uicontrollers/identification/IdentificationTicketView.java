@@ -19,6 +19,7 @@ public class IdentificationTicketView extends IdentificationView {
     private MPTextView mNameTextView;
     private MPTextView mLastNameTextView;
     private MPTextView mIdentificationTypeIdTextView;
+    private MPTextView mIdentificationPlaceholderContainer;
     private FrameLayout mLastNameContainer;
 
     public IdentificationTicketView(Context context) {
@@ -33,6 +34,7 @@ public class IdentificationTicketView extends IdentificationView {
         mLastNameTextView = mView.findViewById(R.id.mpsdkLastnameView);
         mIdentificationTypeIdTextView = mView.findViewById(R.id.mpsdkIdentificationTypeId);
         mLastNameContainer = mView.findViewById(R.id.mpsdkLastnameContainer);
+        mIdentificationPlaceholderContainer = mView.findViewById(R.id.mpsdkIdentificationCardholderContainer);
         drawIdentificationTypeName();
     }
 
@@ -65,10 +67,9 @@ public class IdentificationTicketView extends IdentificationView {
     private void drawIdentificationName() {
         if (TextUtil.isEmpty(mName)) {
             if (TextUtil.isEmpty(mLastName)) {
-                mNameTextView.setText(mContext.getText(R.string.px_name_and_lastname_identification_label));
                 configureAlphaColorNameText();
             } else {
-                mNameTextView.setText("");
+                mNameTextView.setText(TextUtil.EMPTY);
             }
         } else {
             mNameTextView.setText(mName);
@@ -90,6 +91,26 @@ public class IdentificationTicketView extends IdentificationView {
         if (mIdentificationType != null && !TextUtil.isEmpty(mIdentificationType.getId())) {
             mIdentificationTypeIdTextView.setText(mIdentificationType.getId());
         }
+    }
+
+    public void drawNamePlaceholder() {
+        final String name = mContext.getResources().getString(R.string.px_name_and_lastname_identification_label);
+        mNameTextView.setText(name);
+    }
+
+    public void drawBusinessNamePlaceholder() {
+        final String businessName = mContext.getResources().getString(R.string.px_business_name_identification_label);
+        mNameTextView.setText(businessName);
+    }
+
+    public void drawCpfIdentificationNumberPlaceholder() {
+        final String placeholder = mContext.getResources().getString(R.string.px_cpf_card_holder_identification_hint);
+        mIdentificationPlaceholderContainer.setText(placeholder);
+    }
+
+    public void drawCnpjIdentificationNumberPlaceholder() {
+        final String placeholder = mContext.getResources().getString(R.string.px_cnpj_card_holder_identification_hint);
+        mIdentificationPlaceholderContainer.setText(placeholder);
     }
 
     public void setIdentificationName(String name) {

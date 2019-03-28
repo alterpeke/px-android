@@ -29,6 +29,7 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
 import com.mercadopago.android.px.internal.adapters.IdentificationTypesAdapter;
 import com.mercadopago.android.px.internal.base.PXActivity;
 import com.mercadopago.android.px.internal.callbacks.PaymentMethodSelectionCallback;
@@ -83,8 +84,9 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
 
     public static final int REVIEW_PAYMENT_METHODS_REQUEST_CODE = 21;
 
+
+    public static final String PARAM_MERCADO_PAGO_CARD_STORAGE = "mercadoPagoCardStorage";
     public static final String PARAM_INCLUDES_PAYMENT = "includesPayment";
-    public static final String PARAM_ACCESS_TOKEN = "accessToken";
     public static final String PARAM_PAYMENT_RECOVERY = "paymentRecovery";
 
     public static final String CARD_NUMBER_INPUT = "cardNumber";
@@ -152,20 +154,19 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
      * Starts the guessing card flow with the purpose of storing the card in the users card vault This flows does NOT
      * includes a payment
      *
-     * @param callerActivity: the activity that calls this one
-     * @param accessToken: user accessToken
-     * @param requestCode: the caller request code
+     * @param mercadoPagoCardStorage: The mercadoPagoCardStorage that contains a configuration for CardStorage.
      */
-    public static void startGuessingCardActivityForStorage(final Context callerActivity, final String accessToken,
-        final int requestCode) {
-        final Intent intent = new Intent(callerActivity, GuessingCardActivity.class);
-        intent.putExtra(PARAM_ACCESS_TOKEN, accessToken);
+    public static void startGuessingCardActivityForStorage(final Context context,
+        @NonNull final MercadoPagoCardStorage mercadoPagoCardStorage) {
+        final Intent intent = new Intent(context, GuessingCardActivity.class);
+        intent.putExtra(PARAM_MERCADO_PAGO_CARD_STORAGE, mercadoPagoCardStorage);
         intent.putExtra(GuessingCardActivity.PARAM_INCLUDES_PAYMENT, false);
-        if (callerActivity instanceof Activity) {
-            ((Activity) callerActivity).startActivityForResult(intent, requestCode);
+
+        if (context instanceof Activity) {
+            ((Activity) context).startActivityForResult(intent, mercadoPagoCardStorage.getRequestCode());
         } else {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            callerActivity.startActivity(intent);
+            context.startActivity(intent);
         }
     }
 
@@ -231,10 +232,11 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
             presenter =
                 GuessingCardPresenter.buildGuessingCardPaymentPresenter(Session.getSession(this), paymentRecovery);
         } else {
-            final String accessToken = intent.getStringExtra(PARAM_ACCESS_TOKEN);
+            final MercadoPagoCardStorage mercadoPagoCardStorage = intent.getParcelableExtra(
+                PARAM_MERCADO_PAGO_CARD_STORAGE);
             presenter = GuessingCardPresenter
                 .buildGuessingCardStoragePresenter(Session.getSession(this),
-                    CardAssociationSession.getCardAssociationSession(this), accessToken);
+                    CardAssociationSession.getCardAssociationSession(this), mercadoPagoCardStorage);
         }
 
         presenter.attachView(this);
@@ -819,6 +821,8 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
         mIdentificationTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(final AdapterView<?> adapterView, final View view, final int i, final long l) {
+                clearErrorView();
+                clearErrorIdentificationNumber();
                 presenter.saveIdentificationType((IdentificationType) mIdentificationTypeSpinner.getSelectedItem());
             }
 
@@ -877,9 +881,6 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
             mIdentificationNumberEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
         } else {
             mIdentificationNumberEditText.setInputType(InputType.TYPE_CLASS_TEXT);
-        }
-        if (!mIdentificationNumberEditText.getText().toString().isEmpty()) {
-            presenter.validateIdentificationNumberAndContinue();
         }
     }
 
@@ -1482,17 +1483,29 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
     }
 
     @Override
-    public void finishCardStorageFlowWithSuccess() {
+    public void showSuccessScreen() {
         CardAssociationResultSuccessActivity.startCardAssociationResultSuccessActivity(this);
         finish();
         overridePendingTransition(R.anim.px_slide_right_to_left_in, R.anim.px_slide_right_to_left_out);
     }
 
     @Override
-    public void finishCardStorageFlowWithError(final String accessToken) {
+    public void finishCardStorageFlowWithSuccess() {
+        setResult(RESULT_OK);
+        finish();
+    }
+
+    @Override
+    public void showErrorScreen(final String accessToken) {
         CardAssociationResultErrorActivity.startCardAssociationResultErrorActivity(this, accessToken);
         finish();
         overridePendingTransition(R.anim.px_slide_right_to_left_in, R.anim.px_slide_right_to_left_out);
+    }
+
+    @Override
+    public void finishCardStorageFlowWithError() {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     @Override

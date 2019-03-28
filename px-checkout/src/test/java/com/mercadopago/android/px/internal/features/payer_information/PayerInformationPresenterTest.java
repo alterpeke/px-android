@@ -7,6 +7,7 @@ import com.mercadopago.android.px.mocks.IdentificationTypes;
 import com.mercadopago.android.px.mocks.IdentificationUtils;
 import com.mercadopago.android.px.model.Identification;
 import com.mercadopago.android.px.model.IdentificationType;
+import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.utils.StubFailMpCall;
@@ -37,12 +38,13 @@ public class PayerInformationPresenterTest {
 
     @Mock private PayerInformation.View view;
     @Mock private PayerInformationStateModel stateModel;
+    @Mock private PaymentMethod paymentMethod;
 
     private PayerInformationPresenter presenter;
 
     @Before
     public void setUp() {
-        presenter = new PayerInformationPresenter(stateModel, paymentSettingRepository, identificationRepository);
+        presenter = new PayerInformationPresenter(stateModel, paymentSettingRepository, identificationRepository, paymentMethod);
     }
 
     @Test
@@ -68,7 +70,6 @@ public class PayerInformationPresenterTest {
         when(stateModel.hasIdentificationTypes()).thenReturn(false);
         when(identificationRepository.getIdentificationTypes())
             .thenReturn(new StubSuccessMpCall<>(stubIdentificationTypes));
-        when(stateModel.getIdentificationTypeList()).thenReturn(IdentificationTypes.getEnabledMLBIdentificationTypes());
 
         presenter.attachView(view);
 
@@ -205,15 +206,50 @@ public class PayerInformationPresenterTest {
         presenter.validateIdentification();
 
         verify(view).hideProgressBar();
+        verify(view).showInvalidLengthIdentificationNumberErrorView();
+        verify(view).showErrorIdentificationNumber();
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void whenNumberIsCnpjValidThenClearError() {
+        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCNPJ();
+        final Identification identification = IdentificationUtils.getIdentificationCNPJ();
+        when(stateModel.getIdentificationType()).thenReturn(identificationType);
+        when(stateModel.hasIdentificationTypes()).thenReturn(true);
+        when(stateModel.getIdentification()).thenReturn(identification);
+        presenter.attachView(view);
+
+        presenter.validateIdentification();
+
+        verify(view).hideProgressBar();
+        verify(view).clearErrorView();
+        verify(view).clearErrorIdentificationNumber();
+        verify(view).showIdentificationBusinessNameFocus();
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void whenNumberIsCnpjInvalidThenSetInvalidCnpjNumberErrorView() {
+        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCNPJ();
+        final Identification identification = IdentificationUtils.getIdentificationWithInvalidCnpjNumber();
+        when(stateModel.getIdentificationType()).thenReturn(identificationType);
+        when(stateModel.hasIdentificationTypes()).thenReturn(true);
+        when(stateModel.getIdentification()).thenReturn(identification);
+        presenter.attachView(view);
+
+        presenter.validateIdentification();
+
+        verify(view).hideProgressBar();
         verify(view).showInvalidIdentificationNumberErrorView();
         verify(view).showErrorIdentificationNumber();
         verifyNoMoreInteractions(view);
     }
 
     @Test
-    public void whenNumberIsCpfInvalidThenSetInvalidCpfNumberErrorView() {
-        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCPF();
-        final Identification identification = IdentificationUtils.getIdentificationWithInvalidCpfNumber();
+    public void whenNumberIsCnpjEqualNumbersThenShowInvalidIdentificationNumberErrorView() {
+        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCNPJ();
+        final Identification identification = IdentificationUtils.getIdentificationWithInvalidEqualNumbersCnpj();
         when(stateModel.getIdentificationType()).thenReturn(identificationType);
         when(stateModel.hasIdentificationTypes()).thenReturn(true);
         when(stateModel.getIdentification()).thenReturn(identification);
@@ -222,24 +258,7 @@ public class PayerInformationPresenterTest {
         presenter.validateIdentification();
 
         verify(view).hideProgressBar();
-        verify(view).showInvalidCpfNumberErrorView();
-        verify(view).showErrorIdentificationNumber();
-        verifyNoMoreInteractions(view);
-    }
-
-    @Test
-    public void whenNumberIsCpfEqualNumbersThenSetInvalidCpfNumberErrorView() {
-        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCPF();
-        final Identification identification = IdentificationUtils.getIdentificationWithInvalidEqualNumbersCpf();
-        when(stateModel.getIdentificationType()).thenReturn(identificationType);
-        when(stateModel.hasIdentificationTypes()).thenReturn(true);
-        when(stateModel.getIdentification()).thenReturn(identification);
-        presenter.attachView(view);
-
-        presenter.validateIdentification();
-
-        verify(view).hideProgressBar();
-        verify(view).showInvalidCpfNumberErrorView();
+        verify(view).showInvalidIdentificationNumberErrorView();
         verify(view).showErrorIdentificationNumber();
         verifyNoMoreInteractions(view);
     }
@@ -266,7 +285,7 @@ public class PayerInformationPresenterTest {
     }
 
     @Test
-    public void whenNumberIsValidThenClearError() {
+    public void whenNumberIsCpfValidThenClearError() {
         final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCPF();
         final Identification identification = IdentificationUtils.getIdentificationCPF();
         when(stateModel.getIdentificationType()).thenReturn(identificationType);
@@ -284,6 +303,40 @@ public class PayerInformationPresenterTest {
     }
 
     @Test
+    public void whenNumberIsCpfInvalidThenSetInvalidCpfNumberErrorView() {
+        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCPF();
+        final Identification identification = IdentificationUtils.getIdentificationWithInvalidCpfNumber();
+        when(stateModel.getIdentificationType()).thenReturn(identificationType);
+        when(stateModel.hasIdentificationTypes()).thenReturn(true);
+        when(stateModel.getIdentification()).thenReturn(identification);
+        presenter.attachView(view);
+
+        presenter.validateIdentification();
+
+        verify(view).hideProgressBar();
+        verify(view).showInvalidIdentificationNumberErrorView();
+        verify(view).showErrorIdentificationNumber();
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void whenNumberIsCpfEqualNumbersThenSetInvalidCpfNumberErrorView() {
+        final IdentificationType identificationType = IdentificationTypes.getIdentificationTypeCPF();
+        final Identification identification = IdentificationUtils.getIdentificationWithInvalidEqualNumbersCpf();
+        when(stateModel.getIdentificationType()).thenReturn(identificationType);
+        when(stateModel.hasIdentificationTypes()).thenReturn(true);
+        when(stateModel.getIdentification()).thenReturn(identification);
+        presenter.attachView(view);
+
+        presenter.validateIdentification();
+
+        verify(view).hideProgressBar();
+        verify(view).showInvalidIdentificationNumberErrorView();
+        verify(view).showErrorIdentificationNumber();
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
     public void whenSavedIdentificationTypeIsNotNullThenSetIdentificationNumberRestrictions() {
         final List<IdentificationType> stubIdentificationTypes = IdentificationTypes.getEnabledMLBIdentificationTypes();
         final IdentificationType identificationType = stubIdentificationTypes.get(0);
@@ -291,7 +344,6 @@ public class PayerInformationPresenterTest {
         when(identificationRepository.getIdentificationTypes())
             .thenReturn(new StubSuccessMpCall<>(stubIdentificationTypes));
         when(stateModel.getIdentification()).thenReturn(new Identification());
-        when(stateModel.getIdentificationTypeList()).thenReturn(IdentificationTypes.getEnabledMLBIdentificationTypes());
 
         presenter.attachView(view);
         presenter.saveIdentificationType(identificationType);

@@ -8,12 +8,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import com.mercadolibre.android.ui.widgets.MeliButton;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.core.internal.MercadoPagoCardStorage;
 import com.mercadopago.android.px.internal.features.guessing_card.GuessingCardActivity;
 import com.mercadopago.android.px.internal.util.StatusBarDecorator;
 import com.mercadopago.android.px.tracking.internal.views.CardAssociationResultViewTrack;
 
 public class CardAssociationResultErrorActivity extends AppCompatActivity {
-    public static final String PARAM_ACCESS_TOKEN = "accessToken";
+    private static final String PARAM_ACCESS_TOKEN = "accessToken";
+    private static final String PARAM_MERCADO_PAGO_CARD_STORAGE = "mercadoPagoCardStorage";
 
     /* default */ String accessToken;
 
@@ -39,9 +41,10 @@ public class CardAssociationResultErrorActivity extends AppCompatActivity {
         final MeliButton retryButton = findViewById(R.id.mpsdkCardAssociationResultRetryButton);
         retryButton.setOnClickListener(v -> {
             // Call GuessingCard flow again forwarding the result
+            MercadoPagoCardStorage mercadoPagoCardStorage = new MercadoPagoCardStorage.Builder(accessToken).build();
             final Intent guessingCardActivityIntent =
                 new Intent(CardAssociationResultErrorActivity.this, GuessingCardActivity.class);
-            guessingCardActivityIntent.putExtra(PARAM_ACCESS_TOKEN, accessToken);
+            guessingCardActivityIntent.putExtra(PARAM_MERCADO_PAGO_CARD_STORAGE, mercadoPagoCardStorage);
             guessingCardActivityIntent.putExtra(GuessingCardActivity.PARAM_INCLUDES_PAYMENT, false);
             guessingCardActivityIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
             startActivity(guessingCardActivityIntent);

@@ -1,3 +1,26 @@
+## VERSION 4.9.1
+_25_03_2019_
+* FIX - Retry card storage
+
+## VERSION 4.9.0
+_21_03_2019_
+* FEATURE - Issuer images in Cards
+* FEATURE - CNPJ payment with Boleto
+* FEATURE - Skip congrats in storage card flow
+
+## VERSION 4.8.1
+_18_03_2019_
+* FIX - Crash on guessing when retrying payment
+
+## VERSION 4.8.0
+_12_03_2019_
+* FEATURE - Account money discounts
+* FEATURE - CPF validation in card guessing
+* ENHANCEMENT - Soldout discount communication
+* ENHANCEMENT - Changes in Loyalty flow
+* ENHANCEMENT - Much lower assets weight
+* FIX - Money In UI fixes
+
 ## VERSION 4.7.3
 _11_03_2019_
 * FIX - disable back button on exploding animation

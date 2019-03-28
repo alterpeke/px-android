@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 public class DefaultPayerInformationDriverTest {
     private static final String TEST_NAME = "Test Name";
     private static final String TEST_LASTNAME = "Test Lastname";
+    private static final String TEST_BUSINESS_NAME = "Test BusinessName";
     private static final String TEST_ID_TYPE = "CPF";
     private static final String TEST_ID_NUMBER = "12312312312";
     private static final String TEST_PAYMNENT_METHOD_ID_BOLBRADESCO = "bolbradesco";
@@ -36,6 +37,7 @@ public class DefaultPayerInformationDriverTest {
         list.add("bolbradesco_identification_number");
         ADDITIONAL_INFO_BOLBRADESCO = Collections.unmodifiableList(list);
     }
+
     static {
         final List<String> list = new ArrayList<>();
         list.add("pec_name");
@@ -104,6 +106,26 @@ public class DefaultPayerInformationDriverTest {
         when(paymentMethod.getId()).thenReturn(TEST_PAYMNENT_METHOD_ID_BOLBRADESCO);
         when(paymentMethod.getAdditionalInfoNeeded()).thenReturn(ADDITIONAL_INFO_BOLBRADESCO);
         when(payerMock.getLastName()).thenReturn(StringUtils.EMPTY);
+        handler.drive(payerInfoDriverCallback);
+        verify(payerInfoDriverCallback).driveToNewPayerData();
+        verifyNoMoreInteractions(payerInfoDriverCallback);
+    }
+
+    @Test
+    public void whenPayerIsNotNullAndHasNoFullNameButHasBusinessNameThenDriveToReviewAndConfirm() {
+        when(paymentMethod.getId()).thenReturn(TEST_PAYMNENT_METHOD_ID_BOLBRADESCO);
+        when(paymentMethod.getAdditionalInfoNeeded()).thenReturn(ADDITIONAL_INFO_BOLBRADESCO);
+        when(payerMock.getFirstName()).thenReturn(TEST_BUSINESS_NAME);
+        handler.drive(payerInfoDriverCallback);
+        verify(payerInfoDriverCallback).driveToReviewConfirm();
+        verifyNoMoreInteractions(payerInfoDriverCallback);
+    }
+
+    @Test
+    public void whenPayerIsNotNullAndHasNoFullNameAndNoBusinessNameThenCollectPayerInfoBolbradesco() {
+        when(paymentMethod.getId()).thenReturn(TEST_PAYMNENT_METHOD_ID_BOLBRADESCO);
+        when(paymentMethod.getAdditionalInfoNeeded()).thenReturn(ADDITIONAL_INFO_BOLBRADESCO);
+        when(payerMock.getFirstName()).thenReturn(StringUtils.EMPTY);
         handler.drive(payerInfoDriverCallback);
         verify(payerInfoDriverCallback).driveToNewPayerData();
         verifyNoMoreInteractions(payerInfoDriverCallback);

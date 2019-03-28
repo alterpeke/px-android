@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.mercadolibre.android.ui.widgets.MeliButton;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.MPCardMaskUtil;
+import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.ViewUtils;
 import com.mercadopago.android.px.internal.view.CompactComponent;
 import com.mercadopago.android.px.internal.view.MPTextView;
@@ -24,7 +25,8 @@ public class PayerInformationComponent extends CompactComponent<Payer, PayerInfo
         void onModifyPayerInformationClicked();
     }
 
-    public PayerInformationComponent(@NonNull final Payer props, @Nonnull final Context context, @Nonnull final Actions actions) {
+    public PayerInformationComponent(@NonNull final Payer props, @Nonnull final Context context,
+        @Nonnull final Actions actions) {
         super(props, actions);
         this.context = context;
     }
@@ -33,11 +35,11 @@ public class PayerInformationComponent extends CompactComponent<Payer, PayerInfo
     public View render(@Nonnull final ViewGroup parent) {
         final ViewGroup payerInfoView = (ViewGroup) ViewUtils.inflate(parent, R.layout.px_payer_information);
         final MPTextView docTypeAndNumber = payerInfoView.findViewById(R.id.payer_doc_type_and_number);
-        final MPTextView fullName = payerInfoView.findViewById(R.id.payer_full_name);
+        final MPTextView payerAppellation = payerInfoView.findViewById(R.id.payer_appellation);
         final ImageView icon = payerInfoView.findViewById(R.id.icon);
 
         ViewUtils.loadOrGone(getIdentificationTypeAndNumber(), docTypeAndNumber);
-        ViewUtils.loadOrGone(getFirstAndLastName(), fullName);
+        ViewUtils.loadOrGone(getPayerAppellation(), payerAppellation);
         drawIconFromRes(icon, R.drawable.px_payer_information);
         drawModifyButton(payerInfoView);
 
@@ -57,10 +59,14 @@ public class PayerInformationComponent extends CompactComponent<Payer, PayerInfo
     }
 
     @NonNull
-    private String getFirstAndLastName() {
-        @StringRes
-        final int res = R.string.px_payer_information_first_and_last_name;
-        return context.getString(res, props.getFirstName(), props.getLastName());
+    private String getPayerAppellation() {
+        //Business name is first name in v1/payments
+        if (TextUtil.isEmpty(props.getLastName())) {
+            return props.getFirstName();
+        } else {
+            @StringRes final int res = R.string.px_payer_information_first_and_last_name;
+            return context.getString(res, props.getFirstName(), props.getLastName());
+        }
     }
 
     @NonNull

@@ -5,6 +5,7 @@ import com.mercadopago.android.px.configuration.AdvancedConfiguration;
 import com.mercadopago.android.px.core.PaymentMethodPlugin;
 import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.datasource.IESCManager;
+
 import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolver;
 import com.mercadopago.android.px.internal.features.PaymentVaultPresenter;
 import com.mercadopago.android.px.internal.features.PaymentVaultView;
@@ -28,15 +29,17 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.preferences.PaymentPreference;
 import com.mercadopago.android.px.utils.StubFailMpCall;
 import com.mercadopago.android.px.utils.StubSuccessMpCall;
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -70,7 +73,7 @@ public class PaymentVaultPresenterTest {
 
     private static final String CUSTOM_PAYMENT_VAULT_TITLE = "CUSTOM_PAYMENT_VAULT_TITLE";
     private static final DiscountConfigurationModel WITHOUT_DISCOUNT =
-            new DiscountConfigurationModel(null, null, false);
+        new DiscountConfigurationModel(null, null, false);
 
     @Before
     public void setUp() {
@@ -85,12 +88,12 @@ public class PaymentVaultPresenterTest {
 
     @NonNull
     private PaymentVaultPresenter getBasePresenter(
-            final PaymentVaultView view) {
+        final PaymentVaultView view) {
 
         final PaymentVaultPresenter presenter =
             new PaymentVaultPresenter(paymentSettingRepository, userSelectionRepository,
                 pluginRepository, discountRepository, groupsRepository, mock(IESCManager.class),
-                    paymentVaultTitleSolver);
+                paymentVaultTitleSolver);
         presenter.attachView(view);
 
         return presenter;
@@ -147,7 +150,7 @@ public class PaymentVaultPresenterTest {
     @Test
     public void whenOnlyCardPaymentTypeAvailableStartCardFlow() {
         final PaymentMethodSearch paymentMethodSearch =
-                PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardMLA();
+            PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardMLA();
         final PaymentVaultPresenter presenter = getPresenter();
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
         when(discountRepository.getCurrentConfiguration()).thenReturn(WITHOUT_DISCOUNT);
@@ -157,8 +160,8 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         verify(view).showAmount(discountRepository.getCurrentConfiguration(),
-                checkoutPreference.getTotalAmount(), mockSite);
-        verify(view).startCardFlow(anyBoolean());
+            checkoutPreference.getTotalAmount(), mockSite);
+        verify(view).startCardFlow();
         verify(paymentSettingRepository, atLeastOnce()).getCheckoutPreference();
         verify(userSelectionRepository, times(1)).select(PaymentTypes.CREDIT_CARD);
         verify(view).setTitle(paymentVaultTitleSolver.solveTitle());
@@ -168,7 +171,7 @@ public class PaymentVaultPresenterTest {
     @Test
     public void whenOnlyCardPaymentTypeAvailableAndCardAvailableThenDoNotSelectAutomatically() {
         final PaymentMethodSearch paymentMethodSearch =
-                PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardAndOneCardMLA();
+            PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardAndOneCardMLA();
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
         when(advancedConfiguration.isAmountRowEnabled()).thenReturn(true);
 
@@ -180,7 +183,7 @@ public class PaymentVaultPresenterTest {
     @Test
     public void whenOnlyCardPaymentTypeAvailableAndAccountMoneyAvailableThenDoNotSelectAutomatically() {
         final PaymentMethodSearch paymentMethodSearch =
-                PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardAndAccountMoneyMLA();
+            PaymentMethodSearchs.getPaymentMethodSearchWithOnlyCreditCardAndAccountMoneyMLA();
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
         when(advancedConfiguration.isAmountRowEnabled()).thenReturn(true);
 
@@ -192,7 +195,7 @@ public class PaymentVaultPresenterTest {
     @Test
     public void whenOnlyOffPaymentTypeAvailableAndAccountMoneyAvailableThenDoNotSelectAutomatically() {
         final PaymentMethodSearch paymentMethodSearch =
-                PaymentMethodSearchs.getPaymentMethodSearchWithOnlyOneOffTypeAndAccountMoneyMLA();
+            PaymentMethodSearchs.getPaymentMethodSearchWithOnlyOneOffTypeAndAccountMoneyMLA();
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
         when(advancedConfiguration.isAmountRowEnabled()).thenReturn(true);
 
@@ -248,7 +251,7 @@ public class PaymentVaultPresenterTest {
         final PaymentVaultPresenter presenter = getBasePresenter(stubView);
         final PaymentMethodSearch paymentMethodSearch = PaymentMethodSearchs.getCompletePaymentMethodSearchMLA();
         paymentMethodSearch.getGroups().get(1).getChildren()
-                .removeAll(paymentMethodSearch.getGroups().get(1).getChildren());
+            .removeAll(paymentMethodSearch.getGroups().get(1).getChildren());
 
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
@@ -262,7 +265,7 @@ public class PaymentVaultPresenterTest {
     public void whenPaymentMethodTypeSelectedThenSelectPaymentMethod() {
         final PaymentVaultPresenter presenter = getBasePresenter(stubView);
         final PaymentMethodSearch paymentMethodSearch =
-                PaymentMethodSearchs.getPaymentMethodSearchWithPaymentMethodOnTop();
+            PaymentMethodSearchs.getPaymentMethodSearchWithPaymentMethodOnTop();
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
         presenter.initialize();
@@ -343,7 +346,7 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         when(groupsRepository.getGroups())
-                .thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
+            .thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
         //Presenter gets resources, fails
         presenter.recoverFromFailure();
@@ -376,7 +379,7 @@ public class PaymentVaultPresenterTest {
     public void whenBoletoSelectedThenCollectPayerInformation() {
         final PaymentVaultPresenter presenter = getPresenter();
         when(groupsRepository.getGroups())
-                .thenReturn(new StubSuccessMpCall<>(PaymentMethodSearchs.getPaymentMethodSearchWithOnlyBolbradescoMLB()));
+            .thenReturn(new StubSuccessMpCall<>(PaymentMethodSearchs.getPaymentMethodSearchWithOnlyBolbradescoMLB()));
         when(discountRepository.getCurrentConfiguration()).thenReturn(WITHOUT_DISCOUNT);
 
         presenter.initialize();
@@ -397,10 +400,10 @@ public class PaymentVaultPresenterTest {
 
     private void verifyInitializeWithGroups() {
         verify(view, atLeastOnce()).showAmount(discountRepository.getCurrentConfiguration(),
-                paymentSettingRepository.getCheckoutPreference().getTotalAmount(),
-                paymentSettingRepository.getCheckoutPreference().getSite());
+            paymentSettingRepository.getCheckoutPreference().getTotalAmount(),
+            paymentSettingRepository.getCheckoutPreference().getSite());
         verify(view, atLeastOnce())
-                .showPluginOptions(any(Collection.class), any(PaymentMethodPlugin.PluginPosition.class));
+            .showPluginOptions(any(Collection.class), any(PaymentMethodPlugin.PluginPosition.class));
         verify(view, atLeastOnce()).hideProgress();
     }
 
@@ -447,20 +450,20 @@ public class PaymentVaultPresenterTest {
 
         @Override
         public void showCustomOptions(final List<CustomSearchItem> customSearchItems,
-                                      final OnSelectedCallback<CustomSearchItem> customSearchItemOnSelectedCallback) {
+            final OnSelectedCallback<CustomSearchItem> customSearchItemOnSelectedCallback) {
             customOptionsShown = customSearchItems;
             customItemSelectionCallback = customSearchItemOnSelectedCallback;
         }
 
         @Override
         public void showPluginOptions(final Collection<PaymentMethodPlugin> items,
-                                      final PaymentMethodPlugin.PluginPosition position) {
+            final PaymentMethodPlugin.PluginPosition position) {
             //Not yet tested
         }
 
         @Override
         public void showSearchItems(final List<PaymentMethodSearchItem> searchItems,
-                                    final OnSelectedCallback<PaymentMethodSearchItem> paymentMethodSearchItemSelectionCallback) {
+            final OnSelectedCallback<PaymentMethodSearchItem> paymentMethodSearchItemSelectionCallback) {
             searchItemsShown = searchItems;
             itemSelectionCallback = paymentMethodSearchItemSelectionCallback;
         }
@@ -476,7 +479,7 @@ public class PaymentVaultPresenterTest {
         }
 
         @Override
-        public void startCardFlow(final Boolean automaticallySelection) {
+        public void startCardFlow() {
             cardFlowStarted = true;
         }
 
@@ -492,8 +495,8 @@ public class PaymentVaultPresenterTest {
 
         @Override
         public void showAmount(@NonNull final DiscountConfigurationModel discountModel,
-                               @NonNull final BigDecimal totalAmount,
-                               @NonNull final Site site) {
+            @NonNull final BigDecimal totalAmount,
+            @NonNull final Site site) {
             //Not yet tested
         }
 
@@ -525,6 +528,11 @@ public class PaymentVaultPresenterTest {
         @Override
         public void showMismatchingPaymentMethodError() {
             //Not yet tested
+        }
+
+        @Override
+        public void saveAutomaticSelection(final boolean automaticSelection) {
+
         }
 
         /* default */ void simulateItemSelection(final int index) {

@@ -47,7 +47,7 @@ public class PaymentMethodComponent extends CompactComponent<PaymentMethodCompon
             @NonNull final String currencyId,
             @NonNull final String statementDescription) {
             final TotalAmount.Props totalAmountProps =
-                new TotalAmount.Props(currencyId, paymentData.getTransactionAmount(),
+                new TotalAmount.Props(currencyId, paymentData.getRawAmount(),
                     paymentData.getPayerCost());
 
             return new PaymentMethodComponent.PaymentMethodProps(paymentData.getPaymentMethod(),
