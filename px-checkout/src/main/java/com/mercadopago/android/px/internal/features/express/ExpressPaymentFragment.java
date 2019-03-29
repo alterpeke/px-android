@@ -461,8 +461,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         showConfirmButton();
         final FragmentManager childFragmentManager = getChildFragmentManager();
         final ExplodingFragment fragment =
-            (ExplodingFragment) FragmentUtil.getFragmentByTag(childFragmentManager, TAG_EXPLODING_FRAGMENT);
-        if (fragment != null && fragment.hasFinished()) {
+            (ExplodingFragment) childFragmentManager.findFragmentByTag(TAG_EXPLODING_FRAGMENT);
+        if (fragment != null && fragment.isAdded() && fragment.hasFinished()) {
             childFragmentManager
                 .beginTransaction()
                 .remove(fragment)

@@ -1,20 +1,17 @@
 package com.mercadopago.android.px.internal.util;
 
-/**
- * Created by vaserber on 11/10/16.
- */
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.support.annotation.NonNull;
 import com.squareup.picasso.Transformation;
 
 public class CircleTransform implements Transformation {
 
     @Override
-    public Bitmap transform(final Bitmap source) {
-        int size = Math.min(source.getWidth(), source.getHeight());
+    public Bitmap transform(@NonNull final Bitmap source) {
+        final int size = Math.min(source.getWidth(), source.getHeight());
 
         final int x = (source.getWidth() - size) / 2;
         final int y = (source.getHeight() - size) / 2;
@@ -24,7 +21,8 @@ public class CircleTransform implements Transformation {
             source.recycle();
         }
 
-        final Bitmap bitmap = Bitmap.createBitmap(size, size, source.getConfig());
+        final Bitmap.Config config = source.getConfig() != null ? source.getConfig() : Bitmap.Config.ARGB_8888;
+        final Bitmap bitmap = Bitmap.createBitmap(size, size, config);
 
         final Canvas canvas = new Canvas(bitmap);
         final Paint paint = new Paint();

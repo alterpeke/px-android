@@ -1,3 +1,9 @@
+## VERSION 4.9.2
+_28_03_2019_
+* FIX - Automatic selection flow
+* FIX - Correct amount for split payment on Congrats
+* FIX - Crash on Circle Transform for certain images
+
 ## VERSION 4.9.1
 _25_03_2019_
 * FIX - Retry card storage

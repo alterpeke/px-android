@@ -161,6 +161,7 @@ public class PaymentVaultPresenterTest {
 
         verify(view).showAmount(discountRepository.getCurrentConfiguration(),
             checkoutPreference.getTotalAmount(), mockSite);
+        verify(view).saveAutomaticSelection(true);
         verify(view).startCardFlow();
         verify(paymentSettingRepository, atLeastOnce()).getCheckoutPreference();
         verify(userSelectionRepository, times(1)).select(PaymentTypes.CREDIT_CARD);
@@ -530,17 +531,17 @@ public class PaymentVaultPresenterTest {
             //Not yet tested
         }
 
-        @Override
-        public void saveAutomaticSelection(final boolean automaticSelection) {
-
-        }
-
         /* default */ void simulateItemSelection(final int index) {
             itemSelectionCallback.onSelected(searchItemsShown.get(index));
         }
 
         /* default */ void simulateCustomItemSelection(final int index) {
             customItemSelectionCallback.onSelected(customOptionsShown.get(index));
+        }
+
+        @Override
+        public void saveAutomaticSelection(final boolean automaticSelection) {
+            //Not yet tested
         }
     }
 }
