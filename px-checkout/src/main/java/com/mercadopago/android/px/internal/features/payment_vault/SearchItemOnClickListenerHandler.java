@@ -8,4 +8,6 @@ public interface SearchItemOnClickListenerHandler {
     void selectItem(@NonNull final CustomSearchItem item);
 
     void selectItem(@NonNull final PaymentMethodSearchItem item);
+
+    void showDisabledPaymentMethodDetailDialog(@NonNull final String paymentMethodType);
 }

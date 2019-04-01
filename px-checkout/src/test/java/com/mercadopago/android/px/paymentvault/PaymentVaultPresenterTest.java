@@ -6,17 +6,16 @@ import com.mercadopago.android.px.internal.datasource.MercadoPagoESC;
 import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolver;
 import com.mercadopago.android.px.internal.features.payment_vault.PaymentVaultPresenter;
 import com.mercadopago.android.px.internal.features.payment_vault.PaymentVaultView;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
-import com.mercadopago.android.px.internal.repository.PluginRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.viewmodel.PaymentMethodViewModel;
 import com.mercadopago.android.px.internal.viewmodel.mappers.CustomSearchOptionViewModelMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodSearchOptionViewModelMapper;
 import com.mercadopago.android.px.mocks.PaymentMethodSearchs;
 import com.mercadopago.android.px.model.Card;
-import com.mercadopago.android.px.model.CustomSearchItem;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
@@ -59,7 +58,7 @@ public class PaymentVaultPresenterTest {
     @Mock private PaymentSettingRepository paymentSettingRepository;
     @Mock private CheckoutPreference checkoutPreference;
     @Mock private UserSelectionRepository userSelectionRepository;
-    @Mock private PluginRepository pluginRepository;
+    @Mock private DisabledPaymentMethodRepository disabledPaymentMethodRepository;
     @Mock private DiscountRepository discountRepository;
     @Mock private GroupsRepository groupsRepository;
     @Mock private AdvancedConfiguration advancedConfiguration;
@@ -89,7 +88,7 @@ public class PaymentVaultPresenterTest {
 
         final PaymentVaultPresenter presenter =
             new PaymentVaultPresenter(paymentSettingRepository, userSelectionRepository,
-                pluginRepository, discountRepository, groupsRepository, mock(MercadoPagoESC.class),
+                disabledPaymentMethodRepository, discountRepository, groupsRepository, mock(MercadoPagoESC.class),
                 paymentVaultTitleSolver);
         presenter.attachView(view);
 
@@ -134,7 +133,8 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         final List<PaymentMethodViewModel> models =
-            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+            new CustomSearchOptionViewModelMapper(presenter, disabledPaymentMethodRepository)
+                .map(paymentMethodSearch.getCustomSearchItems());
         models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
 
         verify(view).showSearchItems(argThat(
@@ -168,7 +168,7 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         verify(view).showAmount(discountRepository.getCurrentConfiguration(),
-                checkoutPreference.getTotalAmount(), mockSite);
+            checkoutPreference.getTotalAmount(), mockSite);
         verify(view).saveAutomaticSelection(true);
         verify(view).startCardFlow();
         verify(paymentSettingRepository, atLeastOnce()).getCheckoutPreference();
@@ -367,7 +367,8 @@ public class PaymentVaultPresenterTest {
         presenter.recoverFromFailure();
 
         final List<PaymentMethodViewModel> models =
-            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+            new CustomSearchOptionViewModelMapper(presenter, disabledPaymentMethodRepository)
+                .map(paymentMethodSearch.getCustomSearchItems());
         models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
 
         verify(view).showSearchItems(argThat(
@@ -399,7 +400,8 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         final List<PaymentMethodViewModel> models =
-            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+            new CustomSearchOptionViewModelMapper(presenter, disabledPaymentMethodRepository)
+                .map(paymentMethodSearch.getCustomSearchItems());
         models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
 
         verify(view).showSearchItems(argThat(
@@ -440,7 +442,8 @@ public class PaymentVaultPresenterTest {
     private void verifyDoNotSelectCustomOptionAutomatically(final PaymentMethodSearch paymentMethodSearch) {
         verifyInitializeWithGroups();
         final List<PaymentMethodViewModel> models =
-            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+            new CustomSearchOptionViewModelMapper(presenter, disabledPaymentMethodRepository)
+                .map(paymentMethodSearch.getCustomSearchItems());
         models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
         verify(view).showSearchItems(argThat(
             argument -> IntStream.range(0, models.size())
@@ -539,6 +542,11 @@ public class PaymentVaultPresenterTest {
         @Override
         public void showMismatchingPaymentMethodError() {
             //Not yet tested
+        }
+
+        @Override
+        public void showDisabledPaymentMethodDetailDialog(@NonNull final String paymentMethodType) {
+            //Do nothing
         }
 
         @Override

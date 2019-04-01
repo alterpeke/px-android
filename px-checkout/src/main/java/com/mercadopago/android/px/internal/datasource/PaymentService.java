@@ -8,6 +8,7 @@ import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandler;
 import com.mercadopago.android.px.internal.callbacks.PaymentServiceHandlerWrapper;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.EscManager;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
@@ -63,6 +64,7 @@ public class PaymentService implements PaymentRepository {
 
     public PaymentService(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
+        @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final PluginRepository pluginRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
@@ -85,7 +87,8 @@ public class PaymentService implements PaymentRepository {
         this.tokenRepository = tokenRepository;
         this.groupsRepository = groupsRepository;
 
-        handlerWrapper = new PaymentServiceHandlerWrapper(this, escManager, instructionsRepository);
+        handlerWrapper =
+            new PaymentServiceHandlerWrapper(this, disabledPaymentMethodRepository, escManager, instructionsRepository);
     }
 
     @Override

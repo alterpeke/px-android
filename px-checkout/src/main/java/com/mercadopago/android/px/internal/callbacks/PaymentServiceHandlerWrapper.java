@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.callbacks;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.EscManager;
 import com.mercadopago.android.px.internal.repository.InstructionsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -30,6 +31,7 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
     @NonNull private final InstructionsRepository instructionsRepository;
     @NonNull private final Queue<Message> messages;
     @NonNull /* default */ final PaymentRepository paymentRepository;
+    @NonNull /* default */ final DisabledPaymentMethodRepository disabledPaymentMethodRepository;
 
     @NonNull private final IPaymentDescriptorHandler paymentHandler = new IPaymentDescriptorHandler() {
         @Override
@@ -42,6 +44,7 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
                 paymentRepository.storePayment(payment);
                 //Must be after store
                 final PaymentResult paymentResult = paymentRepository.createPaymentResult(payment);
+                disabledPaymentMethodRepository.handleDisableablePayment(paymentResult);
                 if (paymentResult.isOffPayment()) {
                     instructionsRepository.getInstructions(paymentResult)
                         .enqueue(new Callback<List<Instruction>>() {
@@ -65,15 +68,19 @@ public final class PaymentServiceHandlerWrapper implements PaymentServiceHandler
         public void visit(@NonNull final BusinessPayment businessPayment) {
             verifyAndHandleEsc(businessPayment);
             paymentRepository.storePayment(businessPayment);
+            final PaymentResult paymentResult = paymentRepository.createPaymentResult(businessPayment);
+            disabledPaymentMethodRepository.handleDisableablePayment(paymentResult);
             addAndProcess(new BusinessPaymentMessage(businessPayment));
         }
     };
 
     public PaymentServiceHandlerWrapper(
         @NonNull final PaymentRepository paymentRepository,
+        @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final EscManager escManager,
         @NonNull final InstructionsRepository instructionsRepository) {
         this.paymentRepository = paymentRepository;
+        this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         this.escManager = escManager;
         this.instructionsRepository = instructionsRepository;
         messages = new LinkedList<>();

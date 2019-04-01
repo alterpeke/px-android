@@ -20,6 +20,7 @@ import com.mercadopago.android.px.internal.controllers.CheckoutTimer;
 import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolverImpl;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.Constants;
+import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
 import com.mercadopago.android.px.internal.features.payer_information.PayerInformationActivity;
 import com.mercadopago.android.px.internal.features.uicontrollers.FontCache;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
@@ -101,7 +102,7 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
         final PaymentSettingRepository configuration = session.getConfigurationModule().getPaymentSettings();
         presenter = new PaymentVaultPresenter(configuration,
             session.getConfigurationModule().getUserSelectionRepository(),
-            session.getPluginRepository(),
+            session.getConfigurationModule().getDisabledPaymentMethodRepository(),
             session.getDiscountRepository(),
             session.getGroupsRepository(),
             session.getMercadoPagoESC(),
@@ -481,5 +482,10 @@ public class PaymentVaultActivity extends PXActivity<PaymentVaultPresenter> impl
     @Override
     public void hideAmountRow() {
         amountView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showDisabledPaymentMethodDetailDialog(@NonNull final String paymentMethodType) {
+        DisabledPaymentMethodDetailDialog.showDialog(getSupportFragmentManager(), paymentMethodType);
     }
 }

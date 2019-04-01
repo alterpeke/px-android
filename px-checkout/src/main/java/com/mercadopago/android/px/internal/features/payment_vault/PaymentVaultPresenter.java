@@ -7,10 +7,10 @@ import com.mercadopago.android.px.internal.datasource.MercadoPagoESC;
 import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolver;
 import com.mercadopago.android.px.internal.features.uicontrollers.AmountRowController;
 import com.mercadopago.android.px.internal.navigation.DefaultPayerInformationDriver;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
-import com.mercadopago.android.px.internal.repository.PluginRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.AmountView;
@@ -39,12 +39,12 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
     private final PaymentSettingRepository paymentSettingRepository;
     @NonNull
     private final UserSelectionRepository userSelectionRepository;
-    @NonNull
-    private final PluginRepository pluginRepository;
 
     private final DiscountRepository discountRepository;
     @NonNull
     private final GroupsRepository groupsRepository;
+
+    @NonNull private DisabledPaymentMethodRepository disabledPaymentMethodRepository;
 
     @NonNull private final MercadoPagoESC mercadoPagoESC;
 
@@ -58,16 +58,16 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
 
     public PaymentVaultPresenter(@NonNull final PaymentSettingRepository paymentSettingRepository,
         @NonNull final UserSelectionRepository userSelectionRepository,
-        @NonNull final PluginRepository pluginService,
+        @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final GroupsRepository groupsRepository,
         @NonNull final MercadoPagoESC mercadoPagoESC,
         @NonNull final PaymentVaultTitleSolver titleSolver) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.userSelectionRepository = userSelectionRepository;
-        pluginRepository = pluginService;
         this.discountRepository = discountRepository;
         this.groupsRepository = groupsRepository;
+        this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         this.mercadoPagoESC = mercadoPagoESC;
         this.titleSolver = titleSolver;
     }
@@ -217,7 +217,8 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
 
     private void showAvailableOptions() {
         final List<PaymentMethodViewModel> searchItemViewModels =
-            new CustomSearchOptionViewModelMapper(this).map(paymentMethodSearch.getCustomSearchItems());
+            new CustomSearchOptionViewModelMapper(this, disabledPaymentMethodRepository)
+                .map(paymentMethodSearch.getCustomSearchItems());
         searchItemViewModels
             .addAll(new PaymentMethodSearchOptionViewModelMapper(this).map(paymentMethodSearch.getGroups()));
         getView().showSearchItems(searchItemViewModels);
@@ -235,6 +236,11 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
             userSelectionRepository.select(paymentMethod, null);
             getView().finishPaymentMethodSelection(paymentMethod);
         }
+    }
+
+    @Override
+    public void showDisabledPaymentMethodDetailDialog(@NonNull final String paymentMethodType) {
+        getView().showDisabledPaymentMethodDetailDialog(paymentMethodType);
     }
 
     private Card getCardWithPaymentMethod(final CustomSearchItem searchItem) {
@@ -303,17 +309,7 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
     }
 
     public boolean isOnlyOneItemAvailable() {
-        int groupCount = 0;
-        int customCount = 0;
-
-        if (paymentMethodSearch != null && paymentMethodSearch.hasSearchItems()) {
-            groupCount = paymentMethodSearch.getGroups().size();
-            customCount = paymentMethodSearch.getCustomSearchItems().size();
-        }
-
-        int pluginCount = pluginRepository.getPaymentMethodPluginCount();
-
-        return groupCount + customCount + pluginCount == 1;
+        return paymentMethodSearch.getGroups().size() + paymentMethodSearch.getCustomSearchItems().size() == 1;
     }
 
     private boolean noPaymentMethodsAvailable() {

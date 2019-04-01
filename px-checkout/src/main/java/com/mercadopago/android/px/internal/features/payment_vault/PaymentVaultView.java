@@ -50,4 +50,6 @@ public interface PaymentVaultView extends MvpView {
     void showMismatchingPaymentMethodError();
 
     void saveAutomaticSelection(final boolean automaticSelection);
+
+    void showDisabledPaymentMethodDetailDialog(@NonNull final String paymentMethodType);
 }
