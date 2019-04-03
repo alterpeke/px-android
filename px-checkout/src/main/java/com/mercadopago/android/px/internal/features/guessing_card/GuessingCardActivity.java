@@ -84,7 +84,6 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
 
     public static final int REVIEW_PAYMENT_METHODS_REQUEST_CODE = 21;
 
-
     public static final String PARAM_MERCADO_PAGO_CARD_STORAGE = "mercadoPagoCardStorage";
     public static final String PARAM_INCLUDES_PAYMENT = "includesPayment";
     public static final String PARAM_PAYMENT_RECOVERY = "paymentRecovery";
@@ -864,7 +863,7 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
 
                 @Override
                 public void changeErrorView() {
-                    //Nothing to do here
+                    checkChangeErrorView();
                 }
 
                 @Override

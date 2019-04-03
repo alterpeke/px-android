@@ -5,8 +5,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mercadopago.android.px.R;
-import com.mercadopago.android.px.core.PaymentMethodPlugin;
-import com.mercadopago.android.px.internal.di.Session;
 
 public final class ResourceUtil {
 
@@ -39,13 +37,11 @@ public final class ResourceUtil {
     }
 
     @DrawableRes
-    public static int getIconResource(final Context context, final String id) {
-        try {
-            final PaymentMethodPlugin paymentMethodPlugin =
-                Session.getSession(context).getPluginRepository().getPlugin(id);
-            return paymentMethodPlugin.getPaymentMethodInfo(context).icon;
-        } catch (final Exception e) {
+    public static int getIconResource(final Context context, @Nullable final String id) {
+        if (id != null) {
             return getPaymentMethodIcon(context, id);
+        } else {
+            return 0;
         }
     }
 

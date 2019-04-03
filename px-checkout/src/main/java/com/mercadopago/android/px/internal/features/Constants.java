@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import com.mercadopago.android.px.internal.features.bank_deals.BankDealsActivity;
 import com.mercadopago.android.px.internal.features.cardvault.CardVaultActivity;
 import com.mercadopago.android.px.internal.features.installments.InstallmentsActivity;
+import com.mercadopago.android.px.internal.features.payment_vault.PaymentVaultActivity;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.BankDeal;
 import com.mercadopago.android.px.model.Card;
@@ -84,7 +85,6 @@ public final class Constants {
 
             private Card card;
             private PaymentRecovery paymentRecovery;
-            private boolean automaticSelection;
 
             public CardVaultActivityBuilder setCard(final Card card) {
                 this.card = card;
@@ -96,16 +96,10 @@ public final class Constants {
                 return this;
             }
 
-            public CardVaultActivityBuilder setAutomaticSelection(final Boolean automaticSelection) {
-                this.automaticSelection = automaticSelection;
-                return this;
-            }
-
             private Intent getIntent(final Context context) {
                 final Intent intent = new Intent(context, CardVaultActivity.class);
                 intent.putExtra("paymentRecovery", JsonUtil.getInstance().toJson(paymentRecovery));
                 intent.putExtra("card", JsonUtil.getInstance().toJson(card));
-                intent.putExtra("automaticSelection", automaticSelection);
                 return intent;
             }
 

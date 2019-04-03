@@ -46,7 +46,7 @@ public final class CardAssociationSession extends ApplicationModule {
 
     @NonNull
     public IESCManager getMercadoPagoESC() {
-        return new ReflectiveESCManager(getContext(), true);
+        return new ReflectiveESCManager(getContext(), true, "card-association-session");
     }
 
     @NonNull

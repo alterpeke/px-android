@@ -83,7 +83,8 @@ public class GuessingCardStoragePresenterTest {
             new GuessingCardStoragePresenter(mercadoPagoCardStorage, cardPaymentMethodRepository,
                 identificationRepository,
                 cardAssociationService,
-                IESCManager, cardAssociationGatewayService);
+                IESCManager,
+                cardAssociationGatewayService);
 
         presenter.attachView(view);
         return presenter;
@@ -424,7 +425,7 @@ public class GuessingCardStoragePresenterTest {
         presenter.createToken();
 
         verify(IESCManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
-        verify(view).finishCardStorageFlowWithSuccess();
+        verify(view).showSuccessScreen();
     }
 
     @Test
@@ -459,7 +460,7 @@ public class GuessingCardStoragePresenterTest {
 
         // Do not save esc, since the tokenization failed
         verify(IESCManager, never()).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
-        verify(view).finishCardStorageFlowWithSuccess();
+        verify(view).showSuccessScreen();
     }
 
     @Test

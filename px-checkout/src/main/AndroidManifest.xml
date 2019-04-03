@@ -35,7 +35,7 @@
             android:theme="@style/Theme.MercadoPagoTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"/>
         <activity
-            android:name=".internal.features.PaymentVaultActivity"
+            android:name=".internal.features.payment_vault.PaymentVaultActivity"
             android:theme="@style/Theme.MercadoPagoTheme.NoActionBar"/>
         <activity
             android:name=".internal.features.installments.InstallmentsActivity"

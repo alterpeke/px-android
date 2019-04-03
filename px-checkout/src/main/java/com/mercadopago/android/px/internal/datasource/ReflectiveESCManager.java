@@ -19,13 +19,15 @@ public final class ReflectiveESCManager implements IESCManager {
     }
 
     @NonNull private final Context appContext;
+    @NonNull private final String sessionId;
+    private final boolean escEnabled;
 
     @Nullable private final Object escManagerInstance;
 
-    private final boolean escEnabled;
-
-    public ReflectiveESCManager(@NonNull final Context appContext, final boolean escEnabled) {
+    public ReflectiveESCManager(@NonNull final Context appContext, final boolean escEnabled,
+        @NonNull final String sessionId) {
         this.appContext = appContext;
+        this.sessionId = sessionId;
         escManagerInstance = createEscManagerInstance();
         this.escEnabled = escEnabled && escManagerInstance != null;
     }
@@ -39,8 +41,9 @@ public final class ReflectiveESCManager implements IESCManager {
     private Object createEscManagerInstance() {
         try {
             final Class escManagerClass = Class.forName(EscManagerNames.CLASS_NAME);
-            final Method factoryMethod = escManagerClass.getMethod(EscManagerNames.FACTORY_METHOD, Context.class);
-            return factoryMethod.invoke(null, appContext);
+            final Method factoryMethod =
+                escManagerClass.getMethod(EscManagerNames.FACTORY_METHOD, Context.class, String.class);
+            return factoryMethod.invoke(null, appContext, sessionId);
         } catch (final Exception e) {
             return null;
         }

@@ -2,21 +2,20 @@ package com.mercadopago.android.px.paymentvault;
 
 import android.support.annotation.NonNull;
 import com.mercadopago.android.px.configuration.AdvancedConfiguration;
-import com.mercadopago.android.px.core.PaymentMethodPlugin;
-import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
 import com.mercadopago.android.px.internal.datasource.IESCManager;
-
 import com.mercadopago.android.px.internal.datasource.PaymentVaultTitleSolver;
-import com.mercadopago.android.px.internal.features.PaymentVaultPresenter;
-import com.mercadopago.android.px.internal.features.PaymentVaultView;
+import com.mercadopago.android.px.internal.features.payment_vault.PaymentVaultPresenter;
+import com.mercadopago.android.px.internal.features.payment_vault.PaymentVaultView;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
 import com.mercadopago.android.px.internal.repository.PluginRepository;
 import com.mercadopago.android.px.internal.repository.UserSelectionRepository;
+import com.mercadopago.android.px.internal.viewmodel.PaymentMethodViewModel;
+import com.mercadopago.android.px.internal.viewmodel.mappers.CustomSearchOptionViewModelMapper;
+import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodSearchOptionViewModelMapper;
 import com.mercadopago.android.px.mocks.PaymentMethodSearchs;
 import com.mercadopago.android.px.model.Card;
-import com.mercadopago.android.px.model.CustomSearchItem;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
@@ -29,7 +28,9 @@ import com.mercadopago.android.px.preferences.CheckoutPreference;
 import com.mercadopago.android.px.preferences.PaymentPreference;
 import com.mercadopago.android.px.utils.StubFailMpCall;
 import com.mercadopago.android.px.utils.StubSuccessMpCall;
-
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,15 +38,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -121,7 +117,12 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        verify(view).showSearchItems(eq(paymentMethodSearch.getGroups()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups());
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
     }
 
     @Test
@@ -131,7 +132,13 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        verify(view).showCustomOptions(eq(paymentMethodSearch.getCustomSearchItems()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+        models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
     }
 
     //Automatic selections
@@ -218,7 +225,12 @@ public class PaymentVaultPresenterTest {
         presenter.initialize();
 
         verify(view).setTitle(selectedSearchItem.getChildrenHeader());
-        verify(view).showSearchItems(eq(selectedSearchItem.getChildren()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new PaymentMethodSearchOptionViewModelMapper(presenter).map(selectedSearchItem.getChildren());
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
         verify(view).hideProgress();
     }
 
@@ -229,7 +241,7 @@ public class PaymentVaultPresenterTest {
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
         presenter.initialize();
-        stubView.simulateItemSelection(0);
+        presenter.selectItem(paymentMethodSearch.getGroups().get(0));
 
         Assert.assertTrue(stubView.cardFlowStarted);
     }
@@ -241,7 +253,7 @@ public class PaymentVaultPresenterTest {
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
         presenter.initialize();
-        stubView.simulateCustomItemSelection(1);
+        presenter.selectItem(paymentMethodSearch.getCustomSearchItems().get(1));
 
         Assert.assertTrue(stubView.savedCardFlowStarted);
         assertEquals(stubView.savedCardSelected.getId(), paymentMethodSearch.getCustomSearchItems().get(1).getId());
@@ -258,7 +270,7 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        stubView.simulateItemSelection(1);
+        presenter.selectItem(paymentMethodSearch.getGroups().get(1));
         Assert.assertTrue(stubView.paymentMethodSelectionStarted);
     }
 
@@ -270,7 +282,7 @@ public class PaymentVaultPresenterTest {
         when(groupsRepository.getGroups()).thenReturn(new StubSuccessMpCall<>(paymentMethodSearch));
 
         presenter.initialize();
-        stubView.simulateItemSelection(1);
+        presenter.selectItem(paymentMethodSearch.getGroups().get(1));
 
         Assert.assertEquals(paymentMethodSearch.getGroups().get(1).getId(), stubView.selectedPaymentMethod.getId());
     }
@@ -318,7 +330,8 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        assertEquals(paymentMethodSearch.getCustomSearchItems().size(), stubView.customOptionsShown.size());
+        assertEquals(paymentMethodSearch.getCustomSearchItems().size() + paymentMethodSearch.getGroups().size(),
+            stubView.searchItemsShown.size());
     }
 
     //Discounts
@@ -352,7 +365,13 @@ public class PaymentVaultPresenterTest {
         //Presenter gets resources, fails
         presenter.recoverFromFailure();
 
-        verify(view).showSearchItems(eq(paymentMethodSearch.getGroups()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+        models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
     }
 
     @Test
@@ -362,7 +381,12 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        verify(view).showSearchItems(eq(paymentMethodSearch.getGroups()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups());
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
     }
 
     @Test
@@ -373,7 +397,13 @@ public class PaymentVaultPresenterTest {
 
         presenter.initialize();
 
-        verify(view).showCustomOptions(eq(paymentMethodSearch.getCustomSearchItems()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+        models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
+
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
     }
 
     @Test
@@ -403,27 +433,26 @@ public class PaymentVaultPresenterTest {
         verify(view, atLeastOnce()).showAmount(discountRepository.getCurrentConfiguration(),
             paymentSettingRepository.getCheckoutPreference().getTotalAmount(),
             paymentSettingRepository.getCheckoutPreference().getSite());
-        verify(view, atLeastOnce())
-            .showPluginOptions(any(Collection.class), any(PaymentMethodPlugin.PluginPosition.class));
         verify(view, atLeastOnce()).hideProgress();
     }
 
     private void verifyDoNotSelectCustomOptionAutomatically(final PaymentMethodSearch paymentMethodSearch) {
         verifyInitializeWithGroups();
-        verify(view).showCustomOptions(eq(paymentMethodSearch.getCustomSearchItems()), any(OnSelectedCallback.class));
-        verify(view).showSearchItems(eq(paymentMethodSearch.getGroups()), any(OnSelectedCallback.class));
+        final List<PaymentMethodViewModel> models =
+            new CustomSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getCustomSearchItems());
+        models.addAll(new PaymentMethodSearchOptionViewModelMapper(presenter).map(paymentMethodSearch.getGroups()));
+        verify(view).showSearchItems(argThat(
+            argument -> IntStream.range(0, models.size())
+                .allMatch(i -> models.get(i).getPaymentMethodId().equals(argument.get(i).getPaymentMethodId()))));
         verify(view).setTitle(paymentVaultTitleSolver.solveTitle());
         verifyNoMoreInteractions(view);
     }
 
     private static class StubView implements PaymentVaultView {
 
-        /* default */ List<PaymentMethodSearchItem> searchItemsShown;
-        /* default */ List<CustomSearchItem> customOptionsShown;
+        /* default */ List<PaymentMethodViewModel> searchItemsShown;
         /* default */ boolean cardFlowStarted = false;
         /* default */ PaymentMethod selectedPaymentMethod;
-        private OnSelectedCallback<PaymentMethodSearchItem> itemSelectionCallback;
-        private OnSelectedCallback<CustomSearchItem> customItemSelectionCallback;
         /* default */ boolean savedCardFlowStarted;
         /* default */ Card savedCardSelected;
         /* default */ boolean paymentMethodSelectionStarted = false;
@@ -436,7 +465,7 @@ public class PaymentVaultPresenterTest {
 
         @Override
         public void showSelectedItem(final PaymentMethodSearchItem item) {
-            searchItemsShown = item.getChildren();
+            searchItemsShown = new PaymentMethodSearchOptionViewModelMapper(any()).map(item.getChildren());
         }
 
         @Override
@@ -450,23 +479,8 @@ public class PaymentVaultPresenterTest {
         }
 
         @Override
-        public void showCustomOptions(final List<CustomSearchItem> customSearchItems,
-            final OnSelectedCallback<CustomSearchItem> customSearchItemOnSelectedCallback) {
-            customOptionsShown = customSearchItems;
-            customItemSelectionCallback = customSearchItemOnSelectedCallback;
-        }
-
-        @Override
-        public void showPluginOptions(final Collection<PaymentMethodPlugin> items,
-            final PaymentMethodPlugin.PluginPosition position) {
-            //Not yet tested
-        }
-
-        @Override
-        public void showSearchItems(final List<PaymentMethodSearchItem> searchItems,
-            final OnSelectedCallback<PaymentMethodSearchItem> paymentMethodSearchItemSelectionCallback) {
+        public void showSearchItems(final List<PaymentMethodViewModel> searchItems) {
             searchItemsShown = searchItems;
-            itemSelectionCallback = paymentMethodSearchItemSelectionCallback;
         }
 
         @Override
@@ -512,11 +526,6 @@ public class PaymentVaultPresenterTest {
         }
 
         @Override
-        public void cleanPaymentMethodOptions() {
-            //Not yet tested
-        }
-
-        @Override
         public void showDetailDialog(@NonNull final DiscountConfigurationModel discountModel) {
             //Do nothing
         }
@@ -529,14 +538,6 @@ public class PaymentVaultPresenterTest {
         @Override
         public void showMismatchingPaymentMethodError() {
             //Not yet tested
-        }
-
-        /* default */ void simulateItemSelection(final int index) {
-            itemSelectionCallback.onSelected(searchItemsShown.get(index));
-        }
-
-        /* default */ void simulateCustomItemSelection(final int index) {
-            customItemSelectionCallback.onSelected(customOptionsShown.get(index));
         }
 
         @Override

@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.base.PXActivity;
-import com.mercadopago.android.px.internal.datasource.ReflectiveESCManager;
 import com.mercadopago.android.px.internal.di.ConfigurationModule;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.business_result.BusinessPaymentResultActivity;
@@ -92,7 +91,7 @@ public class CheckoutActivity extends PXActivity implements CheckoutView, Expres
         final CheckoutProvider provider = new CheckoutProviderImpl(this,
             merchantPublicKey,
             privateKey,
-            new ReflectiveESCManager(this, presenter.isESCEnabled()));
+            Session.getSession(getApplicationContext()).getMercadoPagoESC());
 
         presenter.attachResourcesProvider(provider);
         presenter.attachView(this);

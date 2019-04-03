@@ -120,8 +120,10 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
     }
 
     public static GuessingCardPresenter buildGuessingCardStoragePresenter(final Session session,
-        final CardAssociationSession cardAssociationSession, @NonNull final MercadoPagoCardStorage mercadoPagoCardStorage) {
-        return new GuessingCardStoragePresenter(mercadoPagoCardStorage, cardAssociationSession.getCardPaymentMethodRepository(),
+        final CardAssociationSession cardAssociationSession,
+        @NonNull final MercadoPagoCardStorage mercadoPagoCardStorage) {
+        return new GuessingCardStoragePresenter(mercadoPagoCardStorage,
+            cardAssociationSession.getCardPaymentMethodRepository(),
             session.getIdentificationRepository(), cardAssociationSession.getCardAssociationService(),
             cardAssociationSession.getMercadoPagoESC(),
             cardAssociationSession.getGatewayService());
@@ -279,7 +281,7 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
         if (TextUtil.isEmpty(identificationNumber)) {
             getView().clearErrorView();
             getView().clearErrorIdentificationNumber();
-        } else {
+        } else if (getIdentificationNumberMaxLength() == identificationNumber.length()) {
             validateIdentificationNumber();
         }
     }
@@ -480,7 +482,7 @@ public abstract class GuessingCardPresenter extends BasePresenter<GuessingCard.V
                     createToken();
                 }
             });
-            if(isViewAttached()) {
+            if (isViewAttached()) {
                 getView().showError(error, requestOrigin);
             }
         }

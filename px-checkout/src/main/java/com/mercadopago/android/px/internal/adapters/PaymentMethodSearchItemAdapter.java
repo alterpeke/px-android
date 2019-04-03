@@ -1,25 +1,34 @@
 package com.mercadopago.android.px.internal.adapters;
 
+import android.content.Context;
+import android.graphics.PorterDuff;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import com.mercadopago.android.px.internal.features.uicontrollers.CustomViewController;
-import com.mercadopago.android.px.internal.features.uicontrollers.paymentmethodsearch.PaymentMethodSearchViewController;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.internal.util.ViewUtils;
+import com.mercadopago.android.px.internal.viewmodel.PaymentMethodViewModel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PaymentMethodSearchItemAdapter extends RecyclerView.Adapter<PaymentMethodSearchItemAdapter.ViewHolder> {
 
-    private final List<PaymentMethodSearchViewController> mItems;
+    private final List<PaymentMethodViewModel> items;
 
     public PaymentMethodSearchItemAdapter() {
-        mItems = new ArrayList<>();
+        items = new ArrayList<>();
     }
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, final int position) {
-        final CustomViewController item = mItems.get(position);
-        item.inflateInParent(parent, false);
-        return new ViewHolder(item);
+        return new ViewHolder(
+            LayoutInflater.from(parent.getContext()).inflate(R.layout.px_row_pm_search_item, parent, false));
     }
 
     @Override
@@ -29,37 +38,45 @@ public class PaymentMethodSearchItemAdapter extends RecyclerView.Adapter<Payment
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        PaymentMethodSearchViewController viewController = mItems.get(position);
-        viewController.draw();
+        holder.populate(items.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return items.size();
     }
 
-    public void addItems(final List<PaymentMethodSearchViewController> items) {
-        mItems.addAll(items);
+    public void setItems(@NonNull final Collection<PaymentMethodViewModel> searchItems) {
+        items.clear();
+        items.addAll(searchItems);
     }
 
-    public void clear() {
-        final int size = mItems.size();
-        mItems.clear();
-        notifyItemRangeRemoved(0, size);
-    }
+    public static final class ViewHolder extends RecyclerView.ViewHolder {
 
-    public void notifyItemInserted() {
-        notifyItemInserted(mItems.size() - 1);
-    }
+        private final TextView description;
+        private final TextView comment;
+        private final TextView discountInfo;
+        private final ImageView icon;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final CustomViewController mViewController;
-
-        public ViewHolder(CustomViewController viewController) {
-            super(viewController.getView());
-            mViewController = viewController;
-            mViewController.initializeControls();
+        public ViewHolder(final View itemView) {
+            super(itemView);
+            description = itemView.findViewById(R.id.mpsdkDescription);
+            comment = itemView.findViewById(R.id.mpsdkComment);
+            icon = itemView.findViewById(R.id.mpsdkImage);
+            discountInfo = itemView.findViewById(R.id.mpsdkDiscountInfo);
         }
+
+        void populate(@NonNull final PaymentMethodViewModel model) {
+            final Context context = itemView.getContext();
+            ViewUtils.loadOrGone(model.getDescription(), description);
+            ViewUtils.loadOrGone(model.getComment(), comment);
+            ViewUtils.loadOrGone(model.getIconResourceId(context), icon);
+            ViewUtils.loadOrGone(model.getDiscountInfo(), discountInfo);
+            model.tint(icon);
+
+            itemView.setOnClickListener(v -> model.handleOnClick());
+        }
+
+
     }
 }

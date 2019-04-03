@@ -1,11 +1,9 @@
-package com.mercadopago.android.px.internal.features;
+package com.mercadopago.android.px.internal.features.payment_vault;
 
 import android.support.annotation.NonNull;
-import com.mercadopago.android.px.core.PaymentMethodPlugin;
 import com.mercadopago.android.px.internal.base.MvpView;
-import com.mercadopago.android.px.internal.callbacks.OnSelectedCallback;
+import com.mercadopago.android.px.internal.viewmodel.PaymentMethodViewModel;
 import com.mercadopago.android.px.model.Card;
-import com.mercadopago.android.px.model.CustomSearchItem;
 import com.mercadopago.android.px.model.DiscountConfigurationModel;
 import com.mercadopago.android.px.model.PaymentMethod;
 import com.mercadopago.android.px.model.PaymentMethodSearchItem;
@@ -13,7 +11,6 @@ import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
 import com.mercadopago.android.px.preferences.PaymentPreference;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 
 public interface PaymentVaultView extends MvpView {
@@ -26,13 +23,7 @@ public interface PaymentVaultView extends MvpView {
 
     void hideProgress();
 
-    void showCustomOptions(List<CustomSearchItem> customSearchItems,
-        OnSelectedCallback<CustomSearchItem> customSearchItemOnSelectedCallback);
-
-    void showPluginOptions(Collection<PaymentMethodPlugin> items, PaymentMethodPlugin.PluginPosition position);
-
-    void showSearchItems(List<PaymentMethodSearchItem> searchItems,
-        OnSelectedCallback<PaymentMethodSearchItem> paymentMethodSearchItemSelectionCallback);
+    void showSearchItems(List<PaymentMethodViewModel> searchItems);
 
     void showError(MercadoPagoError mercadoPagoError, String requestOrigin);
 
@@ -51,8 +42,6 @@ public interface PaymentVaultView extends MvpView {
     void hideAmountRow();
 
     void collectPayerInformation();
-
-    void cleanPaymentMethodOptions();
 
     void showDetailDialog(@NonNull final DiscountConfigurationModel discountModel);
 

@@ -1,3 +1,7 @@
+## VERSION 4.9.3
+_29_03_2019_
+* FIX - Friction rate in id card
+
 ## VERSION 4.9.2
 _28_03_2019_
 * FIX - Automatic selection flow
