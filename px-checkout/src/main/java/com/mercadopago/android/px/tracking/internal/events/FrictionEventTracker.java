@@ -57,6 +57,15 @@ public final class FrictionEventTracker extends EventTracker {
         return frictionEventTracker;
     }
 
+    public static EventTracker with(@NonNull final String path,
+        @NonNull final Id fId,
+        @NonNull final Style style,
+        @NonNull final Map<String, String> metadata) {
+        final FrictionEventTracker frictionEventTracker = new FrictionEventTracker(path, fId, style);
+        frictionEventTracker.extraInfo.putAll(metadata);
+        return frictionEventTracker;
+    }
+
     public static EventTracker with(final Id id, final ViewTracker view,
         final Style style) {
         return new FrictionEventTracker(view.getViewPath(), id, style);
@@ -71,7 +80,8 @@ public final class FrictionEventTracker extends EventTracker {
         INVALID_NAME("invalid_name"),
         INVALID_EXP_DATE("invalid_expiration_date"),
         INVALID_CVV("invalid_cvv"),
-        INVALID_DOCUMENT("invalid_document_number");
+        INVALID_DOCUMENT("invalid_document_number"),
+        INVALID_STATUS_DETAIL("invalid_status_detail");
 
         private static final String ATTR = "id";
 

@@ -1,22 +1,20 @@
 package com.mercadopago.android.px.internal.features.paymentresult.components;
 
 import android.content.Context;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.configuration.PaymentResultScreenConfiguration;
-import com.mercadopago.android.px.internal.features.paymentresult.PaymentResultDecorator;
+import com.mercadopago.android.px.internal.features.PaymentResultViewModelFactory;
 import com.mercadopago.android.px.internal.features.paymentresult.model.Badge;
 import com.mercadopago.android.px.internal.features.paymentresult.props.HeaderProps;
 import com.mercadopago.android.px.internal.features.paymentresult.props.PaymentResultBodyProps;
 import com.mercadopago.android.px.internal.features.paymentresult.props.PaymentResultProps;
-import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.view.ActionDispatcher;
 import com.mercadopago.android.px.internal.view.Component;
 import com.mercadopago.android.px.internal.view.LoadingComponent;
 import com.mercadopago.android.px.internal.view.RendererFactory;
-import com.mercadopago.android.px.internal.viewmodel.HeaderTitleFormatter;
+import com.mercadopago.android.px.internal.viewmodel.PaymentResultViewModel;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.PaymentMethods;
 import com.mercadopago.android.px.model.PaymentResult;
@@ -27,11 +25,6 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
     static {
         RendererFactory.register(PaymentResultContainer.class, PaymentResultRenderer.class);
     }
-
-    private static final int DEFAULT_STATUS_BAR_COLOR = R.color.px_blue_status_bar;
-    private static final int GREEN_STATUS_BAR_COLOR = R.color.px_green_status_bar;
-    private static final int RED_STATUS_BAR_COLOR = R.color.px_red_status_bar;
-    private static final int ORANGE_STATUS_BAR_COLOR = R.color.px_orange_status_bar;
 
     public static final int DEFAULT_ICON_IMAGE = R.drawable.px_icon_default;
     public static final int ITEM_ICON_IMAGE = R.drawable.px_icon_product;
@@ -45,7 +38,6 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
     public static final int PENDING_BADGE_ORANGE_IMAGE = R.drawable.px_badge_pending_orange;
     public static final int ERROR_BADGE_IMAGE = R.drawable.px_badge_error;
     public static final int WARNING_BADGE_IMAGE = R.drawable.px_badge_warning;
-
 
     public PaymentResultContainer(@NonNull final ActionDispatcher dispatcher,
         @NonNull final PaymentResultProps props) {
@@ -62,15 +54,19 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
 
     public Header getHeaderComponent(final Context context) {
 
+        final PaymentResultViewModel
+            paymentResultViewModel =
+            PaymentResultViewModelFactory.createPaymentResultViewModel(props.paymentResult);
+
         final HeaderProps headerProps = new HeaderProps.Builder()
             .setHeight(getHeaderMode())
-            .setBackground(getBackground(props.paymentResult))
-            .setStatusBarColor(getStatusBarColor(props.paymentResult))
+            .setBackground(paymentResultViewModel.getBackgroundResId())
+            .setStatusBarColor(paymentResultViewModel.getStatusBarResId())
             .setIconImage(getIconImage(props))
             .setIconUrl(getIconUrl(props))
-            .setBadgeImage(getBadgeImage(props))
-            .setTitle(getTitle(props, context))
-            .setLabel(getLabel(props, context))
+            .setBadgeImage(getBadgeImage(props, paymentResultViewModel))
+            .setTitle(props.hasInstructions() ? props.getInstructionsTitle() : paymentResultViewModel.getTitle(context))
+            .setLabel(paymentResultViewModel.getLabel(context))
             .build();
 
         return new Header(headerProps, getDispatcher());
@@ -78,14 +74,12 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
 
     public boolean hasBodyComponent() {
         if (props.paymentResult != null) {
-            final String status = props.paymentResult.getPaymentStatus();
-            final String statusDetail = props.paymentResult.getPaymentStatusDetail();
-
-            return !(Payment.StatusCodes.STATUS_REJECTED.equalsIgnoreCase(status) &&
-                !Payment.StatusDetail.isRejectedWithDetail(statusDetail));
+            final PaymentResultViewModel paymentResultViewModel =
+                PaymentResultViewModelFactory.createPaymentResultViewModel(props.paymentResult);
+            return paymentResultViewModel.isApprovedSuccess() || paymentResultViewModel.hasBodyError();
         }
 
-        return true;
+        return false;
     }
 
     @Nullable
@@ -119,37 +113,6 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
         return headerMode;
     }
 
-    @ColorRes
-    private int getBackground(@NonNull final PaymentResult paymentResult) {
-        if (PaymentResultDecorator.isSuccessBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return R.color.ui_components_success_color;
-        } else if (PaymentResultDecorator.isErrorNonRecoverableBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return R.color.ui_components_error_color;
-        } else if (PaymentResultDecorator.isPendingOrErrorRecoverableBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return R.color.ui_components_warning_color;
-        } else {
-            return R.color.px_colorPrimary;
-        }
-    }
-
-    private int getStatusBarColor(@NonNull final PaymentResult paymentResult) {
-        if (PaymentResultDecorator.isSuccessBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return GREEN_STATUS_BAR_COLOR;
-        } else if (PaymentResultDecorator.isErrorNonRecoverableBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return RED_STATUS_BAR_COLOR;
-        } else if (PaymentResultDecorator.isPendingOrErrorRecoverableBackground(paymentResult.getPaymentStatus(),
-            paymentResult.getPaymentStatusDetail())) {
-            return ORANGE_STATUS_BAR_COLOR;
-        } else {
-            return DEFAULT_STATUS_BAR_COLOR;
-        }
-    }
-
     @Nullable
     private String getIconUrl(@NonNull final PaymentResultProps props) {
         final PaymentResultScreenConfiguration paymentResultScreenConfiguration =
@@ -176,122 +139,6 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
         } else {
             return DEFAULT_ICON_IMAGE;
         }
-    }
-
-    private CharSequence getTitle(@NonNull final PaymentResultProps props, @NonNull final Context context) {
-        if (props.hasInstructions()) { // Si el medio off tiene instrucciones, tomo las del titulo.
-            return props.getInstructionsTitle();
-        } else if (isPaymentMethodOff(props.paymentResult)) { // Caso off, sin instrucciones.
-            return TextUtil.EMPTY;
-        } else {
-
-            final String status = props.paymentResult.getPaymentStatus();
-            final String statusDetail = props.paymentResult.getPaymentStatusDetail();
-
-            if (Payment.StatusCodes.STATUS_APPROVED.equalsIgnoreCase(status)) {
-                return context.getString(R.string.px_title_approved_payment);
-            } else if (Payment.StatusCodes.STATUS_IN_PROCESS.equalsIgnoreCase(status) ||
-                Payment.StatusCodes.STATUS_PENDING.equalsIgnoreCase(status)) {
-                return context.getString(R.string.px_title_pending_payment);
-            } else if (Payment.StatusCodes.STATUS_REJECTED.equalsIgnoreCase(status)) {
-
-                if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_OTHER_REASON.equals(statusDetail)
-                    || Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_PLUGIN_PM.equals(statusDetail)) {
-                    return context.getString(R.string.px_title_other_reason_rejection);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_INSUFFICIENT_AMOUNT
-                    .equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_text_insufficient_amount);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_DUPLICATED_PAYMENT
-                    .equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_title_duplicated_reason_rejection);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_CARD_DISABLED
-                    .equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_text_active_card);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_REJECTED_HIGH_RISK.equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_title_rejection_high_risk);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_MAX_ATTEMPTS.equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_title_rejection_max_attempts);
-                } else if (
-                    Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_OTHER.equalsIgnoreCase(statusDetail) ||
-                        Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_CARD_NUMBER
-                            .equalsIgnoreCase(statusDetail) ||
-                        Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_SECURITY_CODE
-                            .equalsIgnoreCase(statusDetail) ||
-                        Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_BAD_FILLED_DATE.equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_text_some_card_data_is_incorrect);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_BLACKLIST.equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_title_rejection_blacklist);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_CC_REJECTED_FRAUD.equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_title_rejection_fraud);
-                } else if (Payment.StatusDetail.STATUS_DETAIL_REJECTED_REJECTED_BY_BANK.equalsIgnoreCase(statusDetail)
-                    || Payment.StatusDetail.STATUS_DETAIL_REJECTED_REJECTED_INSUFFICIENT_DATA
-                    .equalsIgnoreCase(statusDetail)) {
-                    return context.getString(R.string.px_bolbradesco_rejection);
-                } else if (props.paymentResult.isCallForAuthorize()) {
-                    return getCallForAuthFormattedTitle(props, context);
-                } else {
-                    return context.getString(R.string.px_title_bad_filled_other);
-                }
-            }
-        }
-
-        return TextUtil.EMPTY;
-    }
-
-
-    private CharSequence getCallForAuthFormattedTitle(@NonNull final PaymentResultProps props, @NonNull final Context context) {
-        final String rejectedCallForAuthorizeTitle = context.getString(R.string.px_title_activity_call_for_authorize);
-        final HeaderTitleFormatter headerTitleFormatter = new HeaderTitleFormatter(props.currencyId,
-            props.paymentResult.getPaymentData().getTransactionAmount(),
-            props.paymentResult.getPaymentData().getPaymentMethod().getName());
-        return headerTitleFormatter.formatTextWithAmount(rejectedCallForAuthorizeTitle);
-    }
-
-
-    public String getLabel(@NonNull PaymentResultProps props, @NonNull final Context context) {
-        if (props.hasCustomizedLabel()) {
-            return props.getPreferenceLabel();
-        } else if (props.paymentResult == null) {
-            return TextUtil.EMPTY;
-        } else {
-            if (isLabelEmpty(props)) {
-                return TextUtil.EMPTY;
-            } else if (isLabelPending(props.paymentResult)) {
-                return context.getString(R.string.px_pending_label);
-            } else if (isLabelError(props.paymentResult)) {
-                return context.getString(R.string.px_rejection_label);
-            }
-        }
-        return TextUtil.EMPTY;
-    }
-
-    private boolean isLabelEmpty(@NonNull PaymentResultProps props) {
-        final String status = props.paymentResult.getPaymentStatus();
-        final String statusDetail = props.paymentResult.getPaymentStatusDetail();
-
-        return Payment.StatusCodes.STATUS_APPROVED.equalsIgnoreCase(status) ||
-            Payment.StatusCodes.STATUS_IN_PROCESS.equalsIgnoreCase(status) ||
-            (Payment.StatusCodes.STATUS_PENDING.equalsIgnoreCase(status)
-                && (!Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equalsIgnoreCase(statusDetail)
-                || isPaymentMethodOff(props.paymentResult)));
-    }
-
-    private boolean isLabelPending(@NonNull final PaymentResult paymentResult) {
-        final String status = paymentResult.getPaymentStatus();
-        final String statusDetail = paymentResult.getPaymentStatusDetail();
-        return Payment.StatusCodes.STATUS_PENDING.equalsIgnoreCase(status)
-            && Payment.StatusDetail.STATUS_DETAIL_PENDING_WAITING_PAYMENT.equalsIgnoreCase(statusDetail);
-    }
-
-    private boolean isLabelError(@NonNull final PaymentResult paymentResult) {
-        return Payment.StatusCodes.STATUS_REJECTED.equalsIgnoreCase(paymentResult.getPaymentStatus());
-    }
-
-    private boolean isPaymentMethodOff(@NonNull final PaymentResult paymentResult) {
-        final String paymentTypeId = paymentResult.getPaymentData().getPaymentMethod().getPaymentTypeId();
-        return PaymentTypes.TICKET.equalsIgnoreCase(paymentTypeId) ||
-            PaymentTypes.ATM.equalsIgnoreCase(paymentTypeId) ||
-            PaymentTypes.BANK_TRANSFER.equalsIgnoreCase(paymentTypeId);
     }
 
     private boolean isItemIconImage(@NonNull final PaymentResult paymentResult) {
@@ -332,7 +179,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
             Payment.StatusCodes.STATUS_REJECTED.equalsIgnoreCase(status));
     }
 
-    private int getBadgeImage(@NonNull final PaymentResultProps props) {
+    private int getBadgeImage(@NonNull final PaymentResultProps props, @NonNull final PaymentResultViewModel viewModel) {
+
         if (props.hasCustomizedBadge()) {
             final String badge = props.getPreferenceBadge();
             switch (badge) {
@@ -345,22 +193,8 @@ public class PaymentResultContainer extends Component<PaymentResultProps, Void> 
             }
         } else if (props.paymentResult == null) {
             return DEFAULT_BADGE_IMAGE;
-        } else if (PaymentResultDecorator.isCheckBagde(props.paymentResult.getPaymentStatus())) {
-            return CHECK_BADGE_IMAGE;
-        } else if (PaymentResultDecorator.isPendingSuccessBadge(props.paymentResult.getPaymentStatus(),
-            props.paymentResult.getPaymentStatusDetail())) {
-            return PENDING_BADGE_GREEN_IMAGE;
-        } else if (PaymentResultDecorator.isPendingWarningBadge(props.paymentResult.getPaymentStatus(),
-            props.paymentResult.getPaymentStatusDetail())) {
-            return PENDING_BADGE_ORANGE_IMAGE;
-        } else if (PaymentResultDecorator.isErrorRecoverableBadge(props.paymentResult.getPaymentStatus(),
-            props.paymentResult.getPaymentStatusDetail())) {
-            return WARNING_BADGE_IMAGE;
-        } else if (PaymentResultDecorator.isErrorNonRecoverableBadge(props.paymentResult.getPaymentStatus(),
-            props.paymentResult.getPaymentStatusDetail())) {
-            return ERROR_BADGE_IMAGE;
         } else {
-            return DEFAULT_BADGE_IMAGE;
+            return viewModel.getBadgeResId();
         }
     }
 }

@@ -2,10 +2,14 @@ package com.mercadopago.android.px.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import junit.framework.Test;
 
 public final class Payment implements IPayment, IPaymentDescriptor {
 
@@ -439,28 +443,45 @@ public final class Payment implements IPayment, IPaymentDescriptor {
         public static final String STATUS_DETAIL_REJECTED_REJECTED_BY_BANK = "rejected_by_bank";
         public static final String STATUS_DETAIL_REJECTED_REJECTED_INSUFFICIENT_DATA = "rejected_insufficient_data";
         public static final String STATUS_DETAIL_REJECTED_BY_REGULATIONS = "rejected_by_regulations";
-        public static final String STATUS_DETAIL_CC_REJECTED_FRAUD =  "cc_rejected_fraud";
+        public static final String STATUS_DETAIL_CC_REJECTED_FRAUD = "cc_rejected_fraud";
         public static final String STATUS_DETAIL_CC_REJECTED_BLACKLIST = "cc_rejected_blacklist";
 
-        public static boolean isKnownErrorDetail(final String statusDetail) {
-            return STATUS_DETAIL_CC_REJECTED_BAD_FILLED_OTHER.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_BAD_FILLED_SECURITY_CODE.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_BAD_FILLED_DATE.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_CARD_DISABLED.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_BAD_FILLED_CARD_NUMBER.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_CALL_FOR_AUTHORIZE.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_DUPLICATED_PAYMENT.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_INSUFFICIENT_AMOUNT.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_MAX_ATTEMPTS.equals(statusDetail)
-                || STATUS_DETAIL_INVALID_ESC.equals(statusDetail)
-                || STATUS_DETAIL_REJECTED_HIGH_RISK.equals(statusDetail)
-                || STATUS_DETAIL_REJECTED_REJECTED_BY_BANK.equals(statusDetail)
-                || STATUS_DETAIL_REJECTED_REJECTED_INSUFFICIENT_DATA.equals(statusDetail)
-                || STATUS_DETAIL_REJECTED_BY_REGULATIONS.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_FRAUD.equals(statusDetail)
-                || STATUS_DETAIL_CC_REJECTED_BLACKLIST.equals(statusDetail);
+        // Return all the static declared fields as a collection
+        private static Collection<Field> getAll() {
+            final Field[] declaredFields = StatusDetail.class.getDeclaredFields();
+            final Collection<Field> staticFields = new ArrayList<>();
+            for (final Field field : declaredFields) {
+                if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+                    staticFields.add(field);
+                }
+            }
+
+            return staticFields;
         }
 
+        // Return all the static declared fields as a String collection
+        public static Collection<String> getAllStaticFields() {
+            final Collection<String> statusList = new ArrayList<>();
+            for (final Field status : getAll()) {
+                statusList.add(status.getName());
+            }
+
+            return statusList;
+        }
+
+        public static boolean isKnownStatusDetail(final String statusDetail) {
+            boolean knownError = false;
+
+            for (final String status : Payment.StatusDetail.getAllStaticFields()) {
+                if (status.toLowerCase().contains(statusDetail.toLowerCase())) {
+                    knownError = true;
+                    break;
+                }
+            }
+
+            return knownError;
+        }
+    
         public static boolean isPaymentStatusRecoverable(final String statusDetail) {
             return STATUS_DETAIL_CC_REJECTED_BAD_FILLED_OTHER.equals(statusDetail) ||
                 STATUS_DETAIL_CC_REJECTED_BAD_FILLED_CARD_NUMBER.equals(statusDetail) ||
@@ -510,10 +531,6 @@ public final class Payment implements IPayment, IPaymentDescriptor {
             default:
                 return false;
             }
-        }
-
-        public static String unknownStatusDetailFallback() {
-            return STATUS_DETAIL_CC_REJECTED_OTHER_REASON;
         }
     }
 }
