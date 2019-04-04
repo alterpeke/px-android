@@ -9,6 +9,7 @@ import com.mercadopago.android.px.internal.callbacks.TaggedCallback;
 import com.mercadopago.android.px.internal.configuration.InternalConfiguration;
 import com.mercadopago.android.px.internal.features.providers.CheckoutProvider;
 import com.mercadopago.android.px.internal.navigation.DefaultPaymentMethodDriver;
+import com.mercadopago.android.px.internal.navigation.OnChangePaymentMethodDriver;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
 import com.mercadopago.android.px.internal.repository.PaymentSettingRepository;
@@ -23,7 +24,6 @@ import com.mercadopago.android.px.model.Card;
 import com.mercadopago.android.px.model.Cause;
 import com.mercadopago.android.px.model.IPaymentDescriptor;
 import com.mercadopago.android.px.model.IPaymentDescriptorHandler;
-import com.mercadopago.android.px.model.IPayment;
 import com.mercadopago.android.px.model.Payment;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
 import com.mercadopago.android.px.model.PaymentRecovery;
@@ -494,22 +494,33 @@ public class CheckoutPresenter extends MvpPresenter<CheckoutView, CheckoutProvid
         recoverPayment();
     }
 
-    //TODO separate with better navigation when we have a proper driver.
     @Override
     public void onChangePaymentMethod() {
         state.paymentMethodEdited = true;
         getView().transitionOut();
 
-        if (internalConfiguration.shouldExitOnPaymentMethodChange()) {
-            final IPayment payment = paymentRepository.getPayment();
-            if (payment instanceof Payment) {
-                getView().finishWithPaymentResult(Constants.RESULT_CHANGE_PAYMENT_METHOD, (Payment) payment);
-            } else {
-                getView().finishWithPaymentResult(Constants.RESULT_CHANGE_PAYMENT_METHOD);
-            }
-        } else {
-            getView().showPaymentMethodSelection();
-        }
+        new OnChangePaymentMethodDriver(internalConfiguration, state, paymentRepository)
+            .drive(new OnChangePaymentMethodDriver.ChangePaymentMethodDriverCallback() {
+                @Override
+                public void driveToFinishWithPaymentResult(final Integer resultCode, final Payment payment) {
+                    getView().finishWithPaymentResult(resultCode, payment);
+                }
+
+                @Override
+                public void driveToFinishWithoutPaymentResult(final Integer resultCode) {
+                    getView().finishWithPaymentResult(resultCode);
+                }
+
+                @Override
+                public void driveToShowOneTap() {
+                    getView().showOneTap();
+                }
+
+                @Override
+                public void driveToShowPaymentMethodSelection() {
+                    getView().showPaymentMethodSelection();
+                }
+            });
     }
 
     //TODO separate with better navigation when we have a proper driver.
