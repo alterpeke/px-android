@@ -259,4 +259,8 @@
     <string name="px_dialog_detail_payment_method_disable_account_money_title">Seu dinheiro do Mercado Pago está indisponível no momento</string>
     <string name="px_dialog_detail_payment_method_disable_detail">Não se preocupe, você pode usar outro meio para concluir o pagamento.</string>
     <string name="px_dialog_detail_payment_method_disable_link">Pagar com outro meio</string>
+
+    <!-- Disable payment method title pager -->
+    <string name="px_payment_method_disable_card_title">Cartão indisponível para este pagamento</string>
+    <string name="px_payment_method_disable_account_money_title">Meio indisponível para este pagamento</string>
 </resources>

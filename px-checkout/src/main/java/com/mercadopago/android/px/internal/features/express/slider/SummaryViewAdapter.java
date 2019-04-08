@@ -17,7 +17,8 @@ public class SummaryViewAdapter extends ViewAdapter<List<SummaryView.Model>, Sum
     }
 
     @Override
-    public void updateData(final int index, final int payerCostSelected, final boolean userWantsToSplit) {
+    public void updateData(final int index, final int payerCostSelected, final boolean userWantsToSplit,
+        final boolean isPaymentMethodDisabled) {
         final SummaryView.Model nextModel = data.get(index);
         if (!nextModel.equals(currentModel)) {
             view.update(nextModel);

@@ -8,10 +8,13 @@ public class SavedCardDrawableFragmentItem implements DrawableFragmentItem {
 
     @NonNull public final String paymentMethodId;
     @NonNull public final CardDisplayInfo card;
+    public final boolean disabled;
 
-    public SavedCardDrawableFragmentItem(@NonNull final String paymentMethodId, @NonNull final CardDisplayInfo card) {
+    public SavedCardDrawableFragmentItem(@NonNull final String paymentMethodId, @NonNull final CardDisplayInfo card,
+        final boolean disabled) {
         this.paymentMethodId = paymentMethodId;
         this.card = card;
+        this.disabled = disabled;
     }
 
     @Override

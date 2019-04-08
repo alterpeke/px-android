@@ -143,7 +143,7 @@ public class ExpressPaymentPresenterTest {
         expressPaymentPresenter.onSliderOptionSelected(currentElementPosition);
 
         verify(view).updateViewForPosition(currentElementPosition, PayerCost.NO_SELECTED,
-            false);
+            false, disabledPaymentMethodRepository.hasPaymentMethodId(paymentMethodIdSelection.get(paymentMethodIndex)));
         verifyNoMoreInteractions(view);
     }
 
@@ -156,7 +156,8 @@ public class ExpressPaymentPresenterTest {
         when(amountConfiguration.getAppliedPayerCost(false)).thenReturn(payerCostList);
         expressPaymentPresenter.onPayerCostSelected(paymentMethodIndex, payerCostList.get(selectedPayerCostIndex));
 
-        verify(view).updateViewForPosition(paymentMethodIndex, selectedPayerCostIndex, false);
+        verify(view).updateViewForPosition(paymentMethodIndex, selectedPayerCostIndex, false,
+            disabledPaymentMethodRepository.hasPaymentMethodId(paymentMethodIdSelection.get(paymentMethodIndex)));
         verify(view).collapseInstallmentsSelection();
         verifyNoMoreInteractions(view);
     }

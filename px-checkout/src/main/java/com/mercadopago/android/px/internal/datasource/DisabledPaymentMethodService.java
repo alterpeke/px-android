@@ -20,7 +20,7 @@ public final class DisabledPaymentMethodService implements DisabledPaymentMethod
         this.sharedPreferences = sharedPreferences;
     }
 
-    private void storeDisabledPaymentMethodId(@NonNull final String paymentMethodId) {
+    public void storeDisabledPaymentMethodId(@NonNull final String paymentMethodId) {
         final Set<String> disabledPaymentMethodIds = getDisabledPaymentMethodIds();
         disabledPaymentMethodIds.add(paymentMethodId);
         sharedPreferences.edit().putStringSet(PREF_DISABLED_PAYMENT_METHODS_IDS, disabledPaymentMethodIds).apply();

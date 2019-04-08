@@ -7,9 +7,11 @@ import com.mercadopago.android.px.model.AccountMoneyMetadata;
 public class AccountMoneyDrawableFragmentItem implements DrawableFragmentItem {
 
     @NonNull public final AccountMoneyMetadata metadata;
+    public final boolean disabled;
 
-    public AccountMoneyDrawableFragmentItem(@NonNull final AccountMoneyMetadata metadata) {
+    public AccountMoneyDrawableFragmentItem(@NonNull final AccountMoneyMetadata metadata, final boolean disabled) {
         this.metadata = metadata;
+        this.disabled = disabled;
     }
 
     @Override

@@ -51,6 +51,8 @@ public final class ConfigurationModule extends ApplicationModule implements Conf
     public DisabledPaymentMethodRepository getDisabledPaymentMethodRepository() {
         if (disabledPaymentMethodRepository == null) {
             disabledPaymentMethodRepository = new DisabledPaymentMethodService(getSharedPreferences());
+            disabledPaymentMethodRepository.storeDisabledPaymentMethodId("account_money");
+            disabledPaymentMethodRepository.storeDisabledPaymentMethodId("298456427");
         }
         return disabledPaymentMethodRepository;
     }

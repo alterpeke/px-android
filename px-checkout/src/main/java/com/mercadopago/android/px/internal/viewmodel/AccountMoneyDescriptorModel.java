@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.textformatter.AmountLabeledFormatter;
+import com.mercadopago.android.px.internal.util.textformatter.SpannableFormatter;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.model.AccountMoneyMetadata;
 
@@ -17,19 +18,26 @@ public class AccountMoneyDescriptorModel extends PaymentMethodDescriptorView.Mod
 
     @NonNull
     public static PaymentMethodDescriptorView.Model createFrom(
-        @NonNull final AccountMoneyMetadata accountMoneyMetadata) {
-        return new AccountMoneyDescriptorModel(accountMoneyMetadata);
+        @NonNull final AccountMoneyMetadata accountMoneyMetadata, final boolean disabledPaymentMethod) {
+        return new AccountMoneyDescriptorModel(accountMoneyMetadata, disabledPaymentMethod);
     }
 
-    /* default */ AccountMoneyDescriptorModel(@NonNull final AccountMoneyMetadata accountMoneyMetadata) {
+    /* default */ AccountMoneyDescriptorModel(@NonNull final AccountMoneyMetadata accountMoneyMetadata,
+        final boolean disabledPaymentMethod) {
         this.accountMoneyMetadata = accountMoneyMetadata;
+        this.disabledPaymentMethod = disabledPaymentMethod;
     }
 
     @Override
     public void updateSpannable(@NonNull final SpannableStringBuilder spannableStringBuilder,
         @NonNull final Context context, @NonNull final TextView textView) {
 
-        if (TextUtil.isEmpty(accountMoneyMetadata.displayInfo.sliderTitle)) {
+        if (disabledPaymentMethod) {
+            final SpannableFormatter amountLabeledFormatter =
+                new SpannableFormatter(spannableStringBuilder, context)
+                    .withTextColor(ContextCompat.getColor(context, R.color.ui_meli_grey));
+            amountLabeledFormatter.apply(R.string.px_payment_method_disable_account_money_title);
+        } else if (TextUtil.isEmpty(accountMoneyMetadata.displayInfo.sliderTitle)) {
             spannableStringBuilder.append(TextUtil.SPACE);
         } else {
             final AmountLabeledFormatter amountLabeledFormatter =

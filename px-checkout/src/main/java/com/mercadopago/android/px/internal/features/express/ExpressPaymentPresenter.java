@@ -8,6 +8,7 @@ import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.SplitPaymentHeaderAdapter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -19,6 +20,7 @@ import com.mercadopago.android.px.internal.view.ElementDescriptorView;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
 import com.mercadopago.android.px.internal.viewmodel.PayerCostSelection;
+import com.mercadopago.android.px.internal.viewmodel.PaymentMethodIdSelection;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDrawableItemMapper;
@@ -53,6 +55,10 @@ import java.util.Set;
         "com.mercadopago.android.px.internal.features.express.PAYER_COST";
     /* default */ PayerCostSelection payerCostSelection;
 
+    private static final String BUNDLE_STATE_PAYMENT_METHOD_IDS =
+        "com.mercadopago.android.px.internal.features.express.PM_IDS";
+    /* default */ PaymentMethodIdSelection paymentMethodIdSelection;
+
     private static final String BUNDLE_STATE_SPLIT_PREF =
         "com.mercadopago.android.px.internal.features.express.SPLIT_PREF";
     /* default */ boolean isSplitUserPreference = false;
@@ -62,6 +68,7 @@ import java.util.Set;
     @NonNull private final DiscountRepository discountRepository;
     @NonNull private final PaymentSettingRepository paymentConfiguration;
     @NonNull private final AmountConfigurationRepository amountConfigurationRepository;
+    @NonNull private final DisabledPaymentMethodRepository disabledPaymentMethodRepository;
     @NonNull private final ExplodeDecoratorMapper explodeDecoratorMapper;
 
     //TODO remove.
@@ -72,6 +79,7 @@ import java.util.Set;
 
     /* default */ ExpressPaymentPresenter(@NonNull final PaymentRepository paymentRepository,
         @NonNull final PaymentSettingRepository paymentConfiguration,
+        @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
         @NonNull final GroupsRepository groupsRepository,
@@ -82,8 +90,9 @@ import java.util.Set;
         this.amountRepository = amountRepository;
         this.discountRepository = discountRepository;
         this.amountConfigurationRepository = amountConfigurationRepository;
+        this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         explodeDecoratorMapper = new ExplodeDecoratorMapper();
-        paymentMethodDrawableItemMapper = new PaymentMethodDrawableItemMapper();
+        paymentMethodDrawableItemMapper = new PaymentMethodDrawableItemMapper(disabledPaymentMethodRepository);
 
         groupsRepository.getGroups().execute(new Callback<PaymentMethodSearch>() {
             @Override
@@ -91,6 +100,7 @@ import java.util.Set;
                 expressMetadataList = paymentMethodSearch.getExpress();
                 //Plus one to compensate for add new payment method
                 payerCostSelection = createNewPayerCostSelected();
+                paymentMethodIdSelection = new PaymentMethodIdSelection(expressMetadataList);
                 cardsWithSplit = paymentMethodSearch.getIdsWithSplitAllowed();
             }
 
@@ -113,8 +123,8 @@ import java.util.Set;
                 amountRepository, elementDescriptorModel, this).map(expressMetadataList);
 
         final List<PaymentMethodDescriptorView.Model> paymentModels =
-            new PaymentMethodDescriptorMapper(paymentConfiguration, amountConfigurationRepository)
-                .map(expressMetadataList);
+            new PaymentMethodDescriptorMapper(paymentConfiguration, amountConfigurationRepository,
+                disabledPaymentMethodRepository).map(expressMetadataList);
 
         final List<SplitPaymentHeaderAdapter.Model> splitHeaderModels =
             new SplitHeaderMapper(paymentConfiguration.getCheckoutPreference().getSite().getCurrencyId(),
@@ -150,6 +160,7 @@ import java.util.Set;
     public void recoverFromBundle(@NonNull final Bundle bundle) {
         payerCostSelection = bundle.getParcelable(BUNDLE_STATE_PAYER_COST);
         isSplitUserPreference = bundle.getBoolean(BUNDLE_STATE_SPLIT_PREF, false);
+        paymentMethodIdSelection = bundle.getParcelable(BUNDLE_STATE_PAYMENT_METHOD_IDS);
     }
 
     @NonNull
@@ -157,6 +168,7 @@ import java.util.Set;
     public Bundle storeInBundle(@NonNull final Bundle bundle) {
         bundle.putParcelable(BUNDLE_STATE_PAYER_COST, payerCostSelection);
         bundle.putBoolean(BUNDLE_STATE_SPLIT_PREF, isSplitUserPreference);
+        bundle.putParcelable(BUNDLE_STATE_PAYMENT_METHOD_IDS, paymentMethodIdSelection);
         return bundle;
     }
 
@@ -312,7 +324,8 @@ import java.util.Set;
     @Override
     public void updateElementPosition(final int paymentMethodIndex) {
         getView().updateViewForPosition(paymentMethodIndex, payerCostSelection.get(paymentMethodIndex),
-            isSplitUserPreference);
+            isSplitUserPreference,
+            disabledPaymentMethodRepository.hasPaymentMethodId(paymentMethodIdSelection.get(paymentMethodIndex)));
     }
 
     /**

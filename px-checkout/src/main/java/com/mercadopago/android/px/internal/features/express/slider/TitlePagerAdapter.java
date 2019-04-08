@@ -22,7 +22,8 @@ public class TitlePagerAdapter extends ViewAdapter<List<PaymentMethodDescriptorV
     }
 
     @Override
-    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit) {
+    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit,
+        final boolean isPaymentMethodDisabled) {
         if (this.currentIndex != currentIndex) {
             final GoingToModel goingTo =
                 this.currentIndex < currentIndex ? GoingToModel.BACKWARDS : GoingToModel.FORWARD;
