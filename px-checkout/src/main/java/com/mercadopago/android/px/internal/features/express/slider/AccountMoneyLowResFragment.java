@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.viewmodel.drawables.AccountMoneyDrawableFragmentItem;
+import com.mercadopago.android.px.model.PaymentTypes;
 
 public class AccountMoneyLowResFragment extends AccountMoneyFragment {
 
@@ -18,6 +19,7 @@ public class AccountMoneyLowResFragment extends AccountMoneyFragment {
         final AccountMoneyLowResFragment accountMoneyFragment = new AccountMoneyLowResFragment();
         final Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_MODEL, item);
+        bundle.putString(ARG_PM_TYPE, PaymentTypes.ACCOUNT_MONEY);
         accountMoneyFragment.setArguments(bundle);
         return accountMoneyFragment;
     }

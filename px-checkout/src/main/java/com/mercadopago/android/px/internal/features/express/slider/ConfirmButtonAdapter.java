@@ -2,24 +2,22 @@ package com.mercadopago.android.px.internal.features.express.slider;
 
 import android.support.annotation.NonNull;
 import com.mercadolibre.android.ui.widgets.MeliButton;
+import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
+import java.util.List;
 
-public class ConfirmButtonAdapter extends ViewAdapter<Integer, MeliButton> {
+public class ConfirmButtonAdapter extends ViewAdapter<List<ConfirmButtonViewModel>, MeliButton> {
 
-    public ConfirmButtonAdapter(final Integer size,
+    public ConfirmButtonAdapter(final List<ConfirmButtonViewModel> models,
         @NonNull final MeliButton view) {
-        super(size, view);
+        super(models, view);
     }
 
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit) {
-        if (isLastElement(currentIndex)) {
+        if (data.get(currentIndex).isDisabled()) {
             view.setState(MeliButton.State.DISABLED);
         } else {
             view.setState(MeliButton.State.NORMAL);
         }
-    }
-
-    private boolean isLastElement(final int position) {
-        return position >= data - 1;
     }
 }

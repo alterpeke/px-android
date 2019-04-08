@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
+import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +15,16 @@ public class HubAdapter extends ViewAdapter<List<ViewAdapter<?, ? extends View>>
         @NonNull public final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels;
         @NonNull public final List<SummaryView.Model> summaryViewModels;
         @NonNull public final List<SplitPaymentHeaderAdapter.Model> splitModels;
+        @NonNull public final List<ConfirmButtonViewModel> confirmButtonViewModels;
 
         public Model(@NonNull final List<PaymentMethodDescriptorView.Model> paymentMethodDescriptorModels,
             @NonNull final List<SummaryView.Model> summaryViewModels,
-            @NonNull final List<SplitPaymentHeaderAdapter.Model> splitModels) {
+            @NonNull final List<SplitPaymentHeaderAdapter.Model> splitModels,
+            @NonNull final List<ConfirmButtonViewModel> confirmButtonViewModels) {
             this.paymentMethodDescriptorModels = paymentMethodDescriptorModels;
             this.summaryViewModels = summaryViewModels;
             this.splitModels = splitModels;
+            this.confirmButtonViewModels = confirmButtonViewModels;
         }
     }
 

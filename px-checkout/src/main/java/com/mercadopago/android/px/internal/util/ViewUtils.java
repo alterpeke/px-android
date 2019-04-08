@@ -96,9 +96,8 @@ public final class ViewUtils {
         loadOrGone(value, textView);
     }
 
-
     public static void loadOrGone(@DrawableRes final int resId, final ImageView imageView) {
-        if(resId == 0){
+        if (resId == 0) {
             imageView.setVisibility(View.GONE);
         } else {
             imageView.setImageResource(resId);
@@ -272,10 +271,21 @@ public final class ViewUtils {
         }
     }
 
-    public static void grayScaleView(@NonNull final ImageView targetView){
+    public static void grayScaleView(@NonNull final ImageView targetView) {
         final ColorMatrix matrix = new ColorMatrix();
         matrix.setSaturation(0);
         final ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
         targetView.setColorFilter(filter);
+    }
+
+    public static void grayScaleViewGroup(@NonNull final ViewGroup viewGroup) {
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+            final View view = viewGroup.getChildAt(i);
+            if (view instanceof ImageView) {
+                grayScaleView((ImageView) view);
+            } else if (view instanceof ViewGroup) {
+                grayScaleViewGroup((ViewGroup) view);
+            }
+        }
     }
 }

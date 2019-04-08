@@ -7,10 +7,12 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.widget.TextView;
 import com.mercadopago.android.px.R;
+import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.util.textformatter.AmountLabeledFormatter;
 import com.mercadopago.android.px.internal.util.textformatter.CFTFormatter;
 import com.mercadopago.android.px.internal.util.textformatter.InterestFormatter;
 import com.mercadopago.android.px.internal.util.textformatter.PayerCostFormatter;
+import com.mercadopago.android.px.internal.util.textformatter.SpannableFormatter;
 import com.mercadopago.android.px.internal.util.textformatter.TextFormatter;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.model.AmountConfiguration;
@@ -29,8 +31,9 @@ public final class CreditCardDescriptorModel extends PaymentMethodDescriptorView
     @NonNull
     public static PaymentMethodDescriptorView.Model createFrom(
         @NonNull final String currencyId,
-        @NonNull final AmountConfiguration amountConfiguration) {
-        return new CreditCardDescriptorModel(currencyId, amountConfiguration);
+        @NonNull final AmountConfiguration amountConfiguration,
+        final boolean disabledPaymentMethod) {
+        return new CreditCardDescriptorModel(currencyId, amountConfiguration, disabledPaymentMethod);
     }
 
     @Override
@@ -39,18 +42,26 @@ public final class CreditCardDescriptorModel extends PaymentMethodDescriptorView
     }
 
     private CreditCardDescriptorModel(@NonNull final String currencyId,
-        @NonNull final AmountConfiguration amountConfiguration) {
+        @NonNull final AmountConfiguration amountConfiguration, final boolean disabledPaymentMethod) {
         this.currencyId = currencyId;
         this.amountConfiguration = amountConfiguration;
+        this.disabledPaymentMethod = disabledPaymentMethod;
     }
 
     @Override
     public void updateSpannable(@NonNull final SpannableStringBuilder spannableStringBuilder,
         @NonNull final Context context, @NonNull final TextView textView) {
-        updateInstallment(spannableStringBuilder, context, textView);
-        updateTotalAmountDescriptionSpannable(spannableStringBuilder, context);
-        updateInterestDescriptionSpannable(spannableStringBuilder, context);
-        updateCFTSpannable(spannableStringBuilder, context);
+        if (disabledPaymentMethod) {
+            final SpannableFormatter amountLabeledFormatter =
+                new SpannableFormatter(spannableStringBuilder, context)
+                    .withTextColor(ContextCompat.getColor(context, R.color.ui_meli_grey));
+            amountLabeledFormatter.apply(R.string.px_payment_method_disable_card_title);
+        } else {
+            updateInstallment(spannableStringBuilder, context, textView);
+            updateTotalAmountDescriptionSpannable(spannableStringBuilder, context);
+            updateInterestDescriptionSpannable(spannableStringBuilder, context);
+            updateCFTSpannable(spannableStringBuilder, context);
+        }
     }
 
     private void updateInstallment(@NonNull final SpannableStringBuilder spannableStringBuilder,

@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.features.express;
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -50,6 +51,9 @@ public class ExpressPaymentPresenterTest {
     private PaymentSettingRepository configuration;
 
     @Mock
+    private DisabledPaymentMethodRepository disabledPaymentMethodRepository;
+
+    @Mock
     private GroupsRepository groupsRepository;
 
     @Mock
@@ -95,8 +99,10 @@ public class ExpressPaymentPresenterTest {
         when(discountRepository.getConfigurationFor(TextUtil.EMPTY)).thenReturn(discountConfigurationModel);
         when(amountConfigurationRepository.getConfigurationFor("123")).thenReturn(amountConfiguration);
 
-        expressPaymentPresenter = new ExpressPaymentPresenter(paymentRepository, configuration, discountRepository,
-            amountRepository, groupsRepository, amountConfigurationRepository);
+        expressPaymentPresenter =
+            new ExpressPaymentPresenter(paymentRepository, configuration, disabledPaymentMethodRepository,
+                discountRepository,
+                amountRepository, groupsRepository, amountConfigurationRepository);
 
         verifyAttachView();
     }
@@ -152,7 +158,8 @@ public class ExpressPaymentPresenterTest {
         final int paymentMethodIndex = 0;
         final int selectedPayerCostIndex = 1;
         final PayerCost firstPayerCost = mock(PayerCost.class);
-        final List<PayerCost> payerCostList = Arrays.asList(mock(PayerCost.class), firstPayerCost, mock(PayerCost.class));
+        final List<PayerCost> payerCostList =
+            Arrays.asList(mock(PayerCost.class), firstPayerCost, mock(PayerCost.class));
         when(amountConfiguration.getAppliedPayerCost(false)).thenReturn(payerCostList);
         expressPaymentPresenter.onPayerCostSelected(paymentMethodIndex, payerCostList.get(selectedPayerCostIndex));
 

@@ -72,7 +72,13 @@
             android:id="@+id/installments_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/container"/>
+            android:layout_alignBottom="@id/space"/>
+
+        <android.support.v4.widget.Space
+            android:id="@+id/space"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/px_badge_offset"
+            android:layout_alignTop="@id/container"/>
 
         <FrameLayout
             android:id="@+id/container"
@@ -84,6 +90,7 @@
                 android:id="@+id/installments_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/px_badge_offset"
                 tools:visibility="gone"/>
 
             <LinearLayout
@@ -133,5 +140,3 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>
-
-

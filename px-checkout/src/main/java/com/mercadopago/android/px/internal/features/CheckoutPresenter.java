@@ -239,7 +239,7 @@ public class CheckoutPresenter extends MvpPresenter<CheckoutView, CheckoutProvid
         }
     }
 
-    /* default */ boolean shouldSkipUserConfirmation(){
+    /* default */ boolean shouldSkipUserConfirmation() {
         return paymentSettingRepository.getPaymentConfiguration().getPaymentProcessor().shouldSkipUserConfirmation();
     }
 
@@ -497,6 +497,8 @@ public class CheckoutPresenter extends MvpPresenter<CheckoutView, CheckoutProvid
     @Override
     public void onChangePaymentMethod() {
         state.paymentMethodEdited = true;
+        userSelectionRepository.reset();
+        paymentSettingRepository.clearToken();
         getView().transitionOut();
 
         new OnChangePaymentMethodDriver(internalConfiguration, state, paymentRepository)

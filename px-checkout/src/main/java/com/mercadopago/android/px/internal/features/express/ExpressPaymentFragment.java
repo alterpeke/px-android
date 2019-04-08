@@ -31,6 +31,7 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.CheckoutActivity;
 import com.mercadopago.android.px.internal.features.Constants;
+import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
 import com.mercadopago.android.px.internal.features.explode.ExplodeDecorator;
 import com.mercadopago.android.px.internal.features.explode.ExplodeParams;
 import com.mercadopago.android.px.internal.features.explode.ExplodingFragment;
@@ -40,6 +41,7 @@ import com.mercadopago.android.px.internal.features.express.animations.SlideAnim
 import com.mercadopago.android.px.internal.features.express.installments.InstallmentsAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.ConfirmButtonAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
+import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment;
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragmentAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodHeaderAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.SplitPaymentHeaderAdapter;
@@ -81,7 +83,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     InstallmentsAdapter.ItemListener,
     SummaryView.OnFitListener,
     ExplodingFragment.ExplodingAnimationListener,
-    SplitPaymentHeaderAdapter.SplitListener {
+    SplitPaymentHeaderAdapter.SplitListener,
+    PaymentMethodFragment.PaymentMethodSelectionHandler {
 
     private static final String TAG_EXPLODING_FRAGMENT = "TAG_EXPLODING_FRAGMENT";
     private static final int REQ_CODE_CARD_VAULT = 0x999;
@@ -126,6 +129,16 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     public void onSplitChanged(final boolean isChecked) {
         final int currentItem = paymentMethodPager.getCurrentItem();
         presenter.onSplitChanged(isChecked, currentItem);
+    }
+
+    @Override
+    public void onPaymentMethodClicked(@NonNull final String paymentMethodType) {
+        DisabledPaymentMethodDetailDialog.showDialog(getChildFragmentManager(), paymentMethodType);
+    }
+
+    @Override
+    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
+        presenter.updateDrawableFragmentItem(item);
     }
 
     public interface CallBack {
@@ -208,7 +221,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
                 public void onGlobalLayout() {
                     if (pagerAndConfirmButtonContainer.getHeight() > 0) {
                         final ViewGroup.LayoutParams params = installmentsRecyclerView.getLayoutParams();
-                        params.height = pagerAndConfirmButtonContainer.getHeight();
+                        params.height = pagerAndConfirmButtonContainer.getHeight() - (int)
+                            getContext().getResources().getDimension(R.dimen.px_badge_offset);
                         installmentsRecyclerView.setLayoutParams(params);
                         pagerAndConfirmButtonContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
@@ -243,6 +257,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         final Session session = Session.getSession(context);
         return new ExpressPaymentPresenter(session.getPaymentRepository(),
             session.getConfigurationModule().getPaymentSettings(),
+            session.getConfigurationModule().getDisabledPaymentMethodRepository(),
             session.getDiscountRepository(),
             session.getAmountRepository(),
             session.getGroupsRepository(),
@@ -326,7 +341,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
             new SummaryViewAdapter(model.summaryViewModels, summaryView),
             new SplitPaymentHeaderAdapter(model.splitModels, splitPaymentView, this),
             new PaymentMethodHeaderAdapter(model.paymentMethodDescriptorModels, paymentMethodHeaderView),
-            new ConfirmButtonAdapter(model.paymentMethodDescriptorModels.size(), confirmButton)
+            new ConfirmButtonAdapter(model.confirmButtonViewModels, confirmButton)
         ));
     }
 

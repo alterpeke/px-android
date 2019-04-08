@@ -22,7 +22,8 @@ public abstract class ViewAdapter<T, V extends View> {
         data = newData;
     }
 
-    public abstract void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit);
+    public abstract void updateData(final int currentIndex, final int payerCostSelected,
+        final boolean userWantsToSplit);
 
     public void updateViewsOrder(@NonNull final View previousView,
         @NonNull final View currentView,

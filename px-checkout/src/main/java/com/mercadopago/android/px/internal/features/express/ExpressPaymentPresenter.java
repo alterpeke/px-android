@@ -8,6 +8,7 @@ import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.SplitPaymentHeaderAdapter;
 import com.mercadopago.android.px.internal.repository.AmountConfigurationRepository;
 import com.mercadopago.android.px.internal.repository.AmountRepository;
+import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.repository.DiscountRepository;
 import com.mercadopago.android.px.internal.repository.GroupsRepository;
 import com.mercadopago.android.px.internal.repository.PaymentRepository;
@@ -18,7 +19,10 @@ import com.mercadopago.android.px.internal.view.AmountDescriptorView;
 import com.mercadopago.android.px.internal.view.ElementDescriptorView;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
+import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.PayerCostSelection;
+import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
+import com.mercadopago.android.px.internal.viewmodel.mappers.ConfirmButtonViewModelMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDrawableItemMapper;
@@ -64,6 +68,7 @@ import java.util.Set;
     @NonNull private final DiscountRepository discountRepository;
     @NonNull private final PaymentSettingRepository paymentConfiguration;
     @NonNull private final AmountConfigurationRepository amountConfigurationRepository;
+    @NonNull private final DisabledPaymentMethodRepository disabledPaymentMethodRepository;
     @NonNull private final ExplodeDecoratorMapper explodeDecoratorMapper;
 
     //TODO remove.
@@ -74,6 +79,7 @@ import java.util.Set;
 
     /* default */ ExpressPaymentPresenter(@NonNull final PaymentRepository paymentRepository,
         @NonNull final PaymentSettingRepository paymentConfiguration,
+        @NonNull final DisabledPaymentMethodRepository disabledPaymentMethodRepository,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final AmountRepository amountRepository,
         @NonNull final GroupsRepository groupsRepository,
@@ -84,6 +90,7 @@ import java.util.Set;
         this.amountRepository = amountRepository;
         this.discountRepository = discountRepository;
         this.amountConfigurationRepository = amountConfigurationRepository;
+        this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         explodeDecoratorMapper = new ExplodeDecoratorMapper();
         paymentMethodDrawableItemMapper = new PaymentMethodDrawableItemMapper();
 
@@ -117,15 +124,19 @@ import java.util.Set;
                 amountRepository, elementDescriptorModel, this, summaryInfo).map(expressMetadataList);
 
         final List<PaymentMethodDescriptorView.Model> paymentModels =
-            new PaymentMethodDescriptorMapper(paymentConfiguration, amountConfigurationRepository)
-                .map(expressMetadataList);
+            new PaymentMethodDescriptorMapper(paymentConfiguration, amountConfigurationRepository,
+                disabledPaymentMethodRepository).map(expressMetadataList);
 
         final List<SplitPaymentHeaderAdapter.Model> splitHeaderModels =
             new SplitHeaderMapper(paymentConfiguration.getCheckoutPreference().getSite().getCurrencyId(),
                 amountConfigurationRepository)
                 .map(expressMetadataList);
 
-        final HubAdapter.Model model = new HubAdapter.Model(paymentModels, summaryModels, splitHeaderModels);
+        final List<ConfirmButtonViewModel> confirmButtonViewModels =
+            new ConfirmButtonViewModelMapper(disabledPaymentMethodRepository).map(expressMetadataList);
+
+        final HubAdapter.Model model =
+            new HubAdapter.Model(paymentModels, summaryModels, splitHeaderModels, confirmButtonViewModels);
 
         getView().showToolbarElementDescriptor(elementDescriptorModel);
 
@@ -373,6 +384,11 @@ import java.util.Set;
         // cancel also update the position.
         // it is used because the installment selection can be expanded by the user.
         onInstallmentSelectionCanceled(currentItem);
+    }
+
+    @Override
+    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
+        item.setDisabled(disabledPaymentMethodRepository.hasPaymentMethodId(item.getId()));
     }
 
     @NonNull

@@ -15,6 +15,7 @@
         android:layout_marginLeft="@dimen/px_m_margin"
         android:layout_marginRight="@dimen/px_m_margin"
         android:layout_marginBottom="@dimen/px_s_margin"
+        android:layout_marginTop="@dimen/px_badge_offset"
         app:cardPreventCornerOverlap="false"
         app:cardBackgroundColor="@color/px_expressCheckoutChangePaymentMethodColor"
         app:cardElevation="2dp">

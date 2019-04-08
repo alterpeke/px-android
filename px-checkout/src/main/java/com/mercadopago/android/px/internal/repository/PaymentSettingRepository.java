@@ -23,6 +23,8 @@ public interface PaymentSettingRepository {
 
     void configure(@NonNull Token token);
 
+    void clearToken();
+
     void configurePreferenceId(@Nullable String preferenceId);
 
     void configurePrivateKey(@Nullable final String privateKey);

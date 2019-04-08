@@ -57,6 +57,11 @@ public class PaymentSettingService implements PaymentSettingRepository {
     }
 
     @Override
+    public void clearToken(){
+        sharedPreferences.edit().remove(PREF_TOKEN).apply();
+    }
+
+    @Override
     public void configurePreferenceId(@Nullable final String preferenceId) {
         final SharedPreferences.Editor edit = sharedPreferences.edit();
         edit.putString(PREF_CHECKOUT_PREF_ID, preferenceId).apply();

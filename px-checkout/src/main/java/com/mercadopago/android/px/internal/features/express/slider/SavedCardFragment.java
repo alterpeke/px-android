@@ -15,17 +15,16 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.ResourceUtil;
 import com.mercadopago.android.px.internal.view.DynamicTextViewRowView;
 import com.mercadopago.android.px.internal.viewmodel.drawables.SavedCardDrawableFragmentItem;
+import com.mercadopago.android.px.model.PaymentTypes;
 
 public class SavedCardFragment extends PaymentMethodFragment {
 
-    protected static final String ARG_CARD = "ARG_CARD";
-
-    @SuppressWarnings("TypeMayBeWeakened")
     @NonNull
     public static Fragment getInstance(final SavedCardDrawableFragmentItem savedCard) {
         final SavedCardFragment savedCardFragment = new SavedCardFragment();
         final Bundle bundle = new Bundle();
-        bundle.putSerializable(ARG_CARD, savedCard);
+        bundle.putSerializable(ARG_MODEL, savedCard);
+        bundle.putString(ARG_PM_TYPE, PaymentTypes.CREDIT_CARD);
         savedCardFragment.setArguments(bundle);
         return savedCardFragment;
     }
@@ -39,10 +38,11 @@ public class SavedCardFragment extends PaymentMethodFragment {
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         final Bundle arguments = getArguments();
-        if (arguments != null && arguments.containsKey(ARG_CARD)) {
+        if (arguments != null && arguments.containsKey(ARG_MODEL)) {
             final SavedCardDrawableFragmentItem drawableCard =
-                (SavedCardDrawableFragmentItem) arguments.getSerializable(ARG_CARD);
+                (SavedCardDrawableFragmentItem) arguments.getSerializable(ARG_MODEL);
             tintBackground(view, drawableCard);
             setCardInformation(view, drawableCard);
             setPaymentMethodIcon(view, drawableCard);
@@ -51,7 +51,6 @@ public class SavedCardFragment extends PaymentMethodFragment {
             throw new IllegalStateException("SavedCardFragment does not contains card information");
         }
     }
-
 
     protected void setIssuerIcon(@NonNull final View view, @NonNull final SavedCardDrawableFragmentItem drawableCard) {
         final ImageView issuerIcon = view.findViewById(R.id.card_issuer_logo);

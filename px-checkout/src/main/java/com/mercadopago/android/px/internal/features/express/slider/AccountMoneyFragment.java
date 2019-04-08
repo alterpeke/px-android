@@ -12,17 +12,16 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.viewmodel.drawables.AccountMoneyDrawableFragmentItem;
 import com.mercadopago.android.px.model.AccountMoneyMetadata;
+import com.mercadopago.android.px.model.PaymentTypes;
 
-public class AccountMoneyFragment extends Fragment {
+public class AccountMoneyFragment extends PaymentMethodFragment {
 
-    protected static final String ARG_MODEL = "ARG_MODEL";
-
-    @SuppressWarnings("TypeMayBeWeakened")
     @NonNull
     public static Fragment getInstance(@NonNull final AccountMoneyDrawableFragmentItem item) {
         final AccountMoneyFragment accountMoneyFragment = new AccountMoneyFragment();
         final Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_MODEL, item);
+        bundle.putString(ARG_PM_TYPE, PaymentTypes.ACCOUNT_MONEY);
         accountMoneyFragment.setArguments(bundle);
         return accountMoneyFragment;
     }
@@ -36,7 +35,7 @@ public class AccountMoneyFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
-
+        super.onViewCreated(view, savedInstanceState);
         final Bundle arguments = getArguments();
         if (arguments != null && arguments.containsKey(ARG_MODEL)) {
             final AccountMoneyDrawableFragmentItem model =
@@ -44,7 +43,7 @@ public class AccountMoneyFragment extends Fragment {
             final TextView message = view.findViewById(R.id.label);
             setMessage(message, model.metadata);
         } else {
-            throw new IllegalStateException("AddNewCardFragment does not contains model info");
+            throw new IllegalStateException("AccountMoneyFragment does not contains model info");
         }
     }
 

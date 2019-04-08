@@ -27,7 +27,8 @@ public class PaymentMethodHeaderAdapter
     @Override
     public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit) {
         this.currentIndex = currentIndex;
-        view.showTitlePager(data.get(currentIndex).hasPayerCostList());
+        PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
+        view.showTitlePager(currentModel.hasPayerCostList() && !currentModel.isDisabledPaymentMethod());
         // Needed to update when no position is changed, but
         // title content has.
         updatePosition(0f, currentIndex);
@@ -41,7 +42,8 @@ public class PaymentMethodHeaderAdapter
             final PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
             final PaymentMethodDescriptorView.Model nextModel = data.get(nextIndex);
             final PaymentMethodHeaderView.Model viewModel = new PaymentMethodHeaderView.Model(goingTo,
-                currentModel.hasPayerCostList(), nextModel.hasPayerCostList());
+                currentModel.hasPayerCostList() && !currentModel.isDisabledPaymentMethod(),
+                nextModel.hasPayerCostList() && !nextModel.isDisabledPaymentMethod());
             view.updateArrowVisibility(positionOffset, viewModel);
         }
     }
