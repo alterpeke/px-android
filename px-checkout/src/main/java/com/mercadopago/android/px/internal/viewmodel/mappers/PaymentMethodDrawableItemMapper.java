@@ -12,11 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentMethodDrawableItemMapper extends Mapper<List<ExpressMetadata>, List<DrawableFragmentItem>> {
-    private final DisabledPaymentMethodRepository disabledPaymentMethodRepository;
-
-    public PaymentMethodDrawableItemMapper(final DisabledPaymentMethodRepository disabledPaymentMethodRepository) {
-        this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
-    }
 
     @Override
     public List<DrawableFragmentItem> map(@NonNull final List<ExpressMetadata> val) {
@@ -25,11 +20,10 @@ public class PaymentMethodDrawableItemMapper extends Mapper<List<ExpressMetadata
         for (final ExpressMetadata expressMetadata : val) {
             if (expressMetadata.isCard()) {
                 result.add(new SavedCardDrawableFragmentItem(expressMetadata.getPaymentMethodId(),
-                    expressMetadata.getCard().getDisplayInfo(),
-                    disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getCard().getId())));
+                    expressMetadata.getCard().getDisplayInfo(), expressMetadata.getCard().getId()));
             } else if (PaymentTypes.isAccountMoney(expressMetadata.getPaymentMethodId())) {
                 result.add(new AccountMoneyDrawableFragmentItem(expressMetadata.getAccountMoney(),
-                    disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getPaymentMethodId())));
+                        expressMetadata.getPaymentMethodId()));
             }
         }
 

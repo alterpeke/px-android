@@ -21,6 +21,7 @@ import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
 import com.mercadopago.android.px.internal.viewmodel.PayerCostSelection;
 import com.mercadopago.android.px.internal.viewmodel.PaymentMethodIdSelection;
+import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDrawableItemMapper;
@@ -92,7 +93,7 @@ import java.util.Set;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.disabledPaymentMethodRepository = disabledPaymentMethodRepository;
         explodeDecoratorMapper = new ExplodeDecoratorMapper();
-        paymentMethodDrawableItemMapper = new PaymentMethodDrawableItemMapper(disabledPaymentMethodRepository);
+        paymentMethodDrawableItemMapper = new PaymentMethodDrawableItemMapper();
 
         groupsRepository.getGroups().execute(new Callback<PaymentMethodSearch>() {
             @Override
@@ -382,6 +383,11 @@ import java.util.Set;
         // cancel also update the position.
         // it is used because the installment selection can be expanded by the user.
         onInstallmentSelectionCanceled(currentItem);
+    }
+
+    @Override
+    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
+        item.setDisabled(disabledPaymentMethodRepository.hasPaymentMethodId(item.getId()));
     }
 
     @NonNull

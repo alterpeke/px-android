@@ -20,7 +20,6 @@ public class SavedCardLowResFragment extends SavedCardFragment {
         final SavedCardLowResFragment savedCardFragment = new SavedCardLowResFragment();
         final Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_MODEL, savedCard);
-        bundle.putBoolean(ARG_DISABLED, savedCard.disabled);
         bundle.putString(ARG_PM_TYPE, PaymentTypes.CREDIT_CARD);
         savedCardFragment.setArguments(bundle);
         return savedCardFragment;

@@ -10,6 +10,4 @@ public interface DisabledPaymentMethodRepository {
     void handleDisableablePayment(@NonNull final PaymentResult paymentResult);
 
     void reset();
-
-    void storeDisabledPaymentMethodId(@NonNull final String paymentMethodId);
 }

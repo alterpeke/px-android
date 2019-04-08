@@ -19,7 +19,6 @@ public class AccountMoneyLowResFragment extends AccountMoneyFragment {
         final AccountMoneyLowResFragment accountMoneyFragment = new AccountMoneyLowResFragment();
         final Bundle bundle = new Bundle();
         bundle.putSerializable(ARG_MODEL, item);
-        bundle.putBoolean(ARG_DISABLED, item.disabled);
         bundle.putString(ARG_PM_TYPE, PaymentTypes.ACCOUNT_MONEY);
         accountMoneyFragment.setArguments(bundle);
         return accountMoneyFragment;

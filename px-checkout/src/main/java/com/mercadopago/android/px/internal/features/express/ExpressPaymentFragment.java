@@ -138,6 +138,11 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         DisabledPaymentMethodDetailDialog.showDialog(getChildFragmentManager(), paymentMethodType);
     }
 
+    @Override
+    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
+        presenter.updateDrawableFragmentItem(item);
+    }
+
     public interface CallBack {
         void onOneTapCanceled();
     }
