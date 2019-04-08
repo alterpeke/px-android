@@ -23,6 +23,8 @@ public final class PaymentTypes {
 
     public static String PLUGIN = "payment_method_plugin";
 
+    public static String CUSTOMER_CREDITS = "consumer_credits";
+
     private PaymentTypes() {
     }
 
@@ -37,7 +39,7 @@ public final class PaymentTypes {
     }
 
     /**
-     *  We don't support account money plugin since 4.5.0
+     *  We don't support plugins since 4.5.0
      */
     @Deprecated
     public static boolean isPlugin(final String type) {
@@ -54,6 +56,7 @@ public final class PaymentTypes {
             add(DIGITAL_CURRENCY);
             add(BANK_TRANSFER);
             add(ACCOUNT_MONEY);
+            add(CUSTOMER_CREDITS);
         }};
     }
 

@@ -159,10 +159,6 @@ public class PaymentService implements PaymentRepository {
                     }
 
                     userSelectionRepository.select(payerCost);
-                } else if (PaymentTypes.isPlugin(paymentTypeId)) {
-                    userSelectionRepository.select(pluginRepository
-                            .getPluginAsPaymentMethod(expressMetadata.getPaymentMethodId(), paymentTypeId),
-                        null);
                 } else if (PaymentTypes.isAccountMoney(paymentTypeId)) {
                     userSelectionRepository
                         .select(new AccountMoneyMapper(paymentMethodSearch).map(expressMetadata), null);
