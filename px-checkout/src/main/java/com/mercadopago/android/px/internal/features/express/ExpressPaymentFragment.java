@@ -356,6 +356,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         installmentsAdapter.setPayerCostSelected(payerCostSelected);
         installmentsAdapter.notifyDataSetChanged();
         hubAdapter.showInstallmentsList();
+        paymentMethodHeaderView.bringToFront();
         expandAndCollapseAnimation.expand();
     }
 
@@ -379,6 +380,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         fadeAnimation.fadeIn(confirmButton);
         fadeAnimation.fadeIn(indicator);
         expandAndCollapseAnimation.collapse();
+        pagerAndConfirmButtonContainer.bringToFront();
     }
 
     @Override
