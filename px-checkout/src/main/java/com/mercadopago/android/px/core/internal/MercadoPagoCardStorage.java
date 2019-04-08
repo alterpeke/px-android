@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.features.guessing_card.GuessingCardActivity;
+import com.mercadopago.android.px.tracking.internal.MPTracker;
 
 /**
  * Provides access to card storage flow
@@ -72,6 +74,9 @@ public final class MercadoPagoCardStorage implements Parcelable {
      * @param context Context.
      */
     public void start(@NonNull final Context context) {
+        //start new session id
+        MPTracker.getInstance().setSessionId(new ApplicationModule(context).getSessionIdProvider().getSessionId());
+
         GuessingCardActivity.startGuessingCardActivityForStorage(context, this);
     }
 

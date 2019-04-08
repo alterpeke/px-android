@@ -1,24 +1,26 @@
 package com.mercadopago.android.px.internal.core;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public final class UserAgentInterceptor implements Interceptor {
+public final class SessionInterceptor implements Interceptor {
 
-    private final String userAgent;
+    @NonNull private final Context context;
+    private static final String SESSION_ID_HEADER = "X-Session-Id";
 
-    public UserAgentInterceptor(@NonNull final String userAgent) {
-        this.userAgent = userAgent;
+    public SessionInterceptor(@NonNull final Context context) {
+        this.context = context.getApplicationContext();
     }
 
     @Override
     public Response intercept(@NonNull final Chain chain) throws IOException {
         final Request originalRequest = chain.request();
         final Request requestWithUserAgent = originalRequest.newBuilder()
-            .header("User-Agent", userAgent)
+            .header(SESSION_ID_HEADER, new ApplicationModule(context).getSessionIdProvider().getSessionId())
             .build();
         return chain.proceed(requestWithUserAgent);
     }

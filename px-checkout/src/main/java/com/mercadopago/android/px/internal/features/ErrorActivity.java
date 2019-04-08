@@ -79,12 +79,7 @@ public class ErrorActivity extends PXActivity {
         titleMessageTextView.setText(getResources().getString(R.string.px_error_title));
         mRetryView = findViewById(R.id.mpsdkErrorRetry);
         mExit = findViewById(R.id.mpsdkExit);
-        mExit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        mExit.setOnClickListener(v -> onBackPressed());
     }
 
     private void fillData() {
@@ -97,13 +92,10 @@ public class ErrorActivity extends PXActivity {
         mErrorMessageTextView.setText(message);
 
         if (mMercadoPagoError.isRecoverable()) {
-            mRetryView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent();
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
+            mRetryView.setOnClickListener(v -> {
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
             });
         } else {
             mRetryView.setVisibility(View.GONE);

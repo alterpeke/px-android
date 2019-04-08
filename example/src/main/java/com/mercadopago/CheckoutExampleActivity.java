@@ -34,7 +34,7 @@ public class CheckoutExampleActivity extends AppCompatActivity {
 
         final View lazy = findViewById(R.id.lazy_init);
         final View progress = findViewById(R.id.progress_bar);
-        lazy.setOnClickListener(v ->  {
+        lazy.setOnClickListener(v -> {
             progress.setVisibility(View.VISIBLE);
             new CheckoutLazyInit(ExamplesUtils.createBase()) {
                 @Override

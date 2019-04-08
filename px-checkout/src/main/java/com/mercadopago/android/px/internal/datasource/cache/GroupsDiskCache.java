@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.datasource.cache;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import com.mercadopago.android.px.internal.core.FileManager;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.model.PaymentMethodSearch;
 import com.mercadopago.android.px.internal.callbacks.MPCall;
@@ -47,12 +48,7 @@ public class GroupsDiskCache implements GroupsCache {
         return new MPCall<PaymentMethodSearch>() {
             @Override
             public void enqueue(final Callback<PaymentMethodSearch> callback) {
-                executorService.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        read(callback);
-                    }
-                });
+                executorService.execute(() -> read(callback));
             }
 
             @Override
@@ -67,27 +63,12 @@ public class GroupsDiskCache implements GroupsCache {
             final String fileContent = fileManager.readFileContent(groupsFile);
             final PaymentMethodSearch paymentMethodSearch = jsonUtil.fromJson(fileContent, PaymentMethodSearch.class);
             if (paymentMethodSearch != null) {
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.success(paymentMethodSearch);
-                    }
-                });
+                mainHandler.post(() -> callback.success(paymentMethodSearch));
             } else {
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.failure(new ApiException());
-                    }
-                });
+                mainHandler.post(() -> callback.failure(new ApiException()));
             }
         } else {
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.failure(new ApiException());
-                }
-            });
+            mainHandler.post(() -> callback.failure(new ApiException()));
         }
     }
 

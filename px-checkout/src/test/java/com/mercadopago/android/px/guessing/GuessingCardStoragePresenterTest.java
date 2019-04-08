@@ -62,7 +62,7 @@ public class GuessingCardStoragePresenterTest {
 
     @Mock private CardPaymentMethodRepository cardPaymentMethodRepository;
     @Mock private IdentificationRepository identificationRepository;
-    @Mock private IESCManager IESCManager;
+    @Mock private IESCManager escManager;
     @Mock private CardAssociationGatewayService cardAssociationGatewayService;
     @Mock private GuessingCard.View view;
     @Mock private CardService cardService;
@@ -83,7 +83,7 @@ public class GuessingCardStoragePresenterTest {
             new GuessingCardStoragePresenter(mercadoPagoCardStorage, cardPaymentMethodRepository,
                 identificationRepository,
                 cardAssociationService,
-                IESCManager,
+                escManager,
                 cardAssociationGatewayService);
 
         presenter.attachView(view);
@@ -424,7 +424,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(IESCManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
+        verify(escManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
         verify(view).showSuccessScreen();
     }
 
@@ -459,7 +459,7 @@ public class GuessingCardStoragePresenterTest {
         presenter.createToken();
 
         // Do not save esc, since the tokenization failed
-        verify(IESCManager, never()).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
+        verify(escManager, never()).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
         verify(view).showSuccessScreen();
     }
 
@@ -555,7 +555,7 @@ public class GuessingCardStoragePresenterTest {
 
         presenter.createToken();
 
-        verify(IESCManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
+        verify(escManager).saveESCWith(DUMMY_CARD_ID, DUMMY_TOKEN_ESC);
         verify(view).finishCardStorageFlowWithSuccess();
     }
 }

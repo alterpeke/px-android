@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.di;
+package com.mercadopago.android.px.internal.core;
 
 import android.content.SharedPreferences;
 

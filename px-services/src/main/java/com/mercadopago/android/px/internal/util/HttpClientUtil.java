@@ -1,12 +1,12 @@
 package com.mercadopago.android.px.internal.util;
 
 import android.content.Context;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.mercadopago.android.px.internal.core.ConnectivityStateInterceptor;
+import com.mercadopago.android.px.internal.core.SessionInterceptor;
 import com.mercadopago.android.px.internal.core.TLSSocketFactory;
 import com.mercadopago.android.px.internal.core.UserAgentInterceptor;
 import com.mercadopago.android.px.services.BuildConfig;
@@ -76,7 +76,6 @@ public final class HttpClientUtil {
         final int readTimeout,
         final int writeTimeout) {
         // Set log info
-
         final OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder()
             .connectTimeout(connectTimeout, TimeUnit.SECONDS)
             .writeTimeout(writeTimeout, TimeUnit.SECONDS)
@@ -87,10 +86,12 @@ public final class HttpClientUtil {
         final HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(LOGGING_INTERCEPTOR);
         okHttpClientBuilder.addInterceptor(interceptor);
-
         // Set cache size
         if (context != null) {
+
             okHttpClientBuilder.addInterceptor(getConnectionInterceptor(context));
+            okHttpClientBuilder.addInterceptor(new SessionInterceptor(context));
+
             try {
                 final Cache cache =
                     new Cache(new File(String.format("%s%s", context.getCacheDir().getPath(), CACHE_DIR_NAME)),

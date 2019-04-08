@@ -29,7 +29,7 @@ import static com.mercadopago.android.px.internal.util.ApiUtil.RequestOrigin.GET
 
 public class GuessingCardStoragePresenter extends GuessingCardPresenter {
 
-    /* default */ final IESCManager IESCManager;
+    /* default */ final IESCManager escManager;
     private final MercadoPagoCardStorage mercadoPagoCardStorage;
     private final CardPaymentMethodRepository cardPaymentMethodRepository;
     private final IdentificationRepository identificationRepository;
@@ -43,14 +43,14 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
         final CardPaymentMethodRepository cardPaymentMethodRepository,
         final IdentificationRepository identificationRepository,
         final CardAssociationService cardAssociationService,
-        final IESCManager IESCManager,
+        final IESCManager escManager,
         final CardAssociationGatewayService gatewayService) {
         super();
         this.mercadoPagoCardStorage = mercadoPagoCardStorage;
         this.cardPaymentMethodRepository = cardPaymentMethodRepository;
         this.identificationRepository = identificationRepository;
         this.cardAssociationService = cardAssociationService;
-        this.IESCManager = IESCManager;
+        this.escManager = escManager;
         this.gatewayService = gatewayService;
     }
 
@@ -227,7 +227,7 @@ public class GuessingCardStoragePresenter extends GuessingCardPresenter {
                 @Override
                 public void onSuccess(final Token token) {
                     if (token != null) {
-                        IESCManager.saveESCWith(token.getCardId(), token.getEsc());
+                        escManager.saveESCWith(token.getCardId(), token.getEsc());
                     }
 
                     if (isViewAttached()) {

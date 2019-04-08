@@ -3,10 +3,6 @@ package com.mercadopago.android.px.model;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by vaserber on 6/5/17.
- */
-
 public class ActionEvent extends Event {
 
     private String screenId;

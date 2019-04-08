@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.features.review_and_confirm.componen
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -62,10 +61,11 @@ public class PayerInformationComponent extends CompactComponent<Payer, PayerInfo
     private String getPayerAppellation() {
         //Business name is first name in v1/payments
         if (TextUtil.isEmpty(props.getLastName())) {
-            return props.getFirstName();
+            return props.getFirstName().toUpperCase();
         } else {
-            @StringRes final int res = R.string.px_payer_information_first_and_last_name;
-            return context.getString(res, props.getFirstName(), props.getLastName());
+            return context
+                .getString(R.string.px_payer_information_first_and_last_name, props.getFirstName(), props.getLastName())
+                .toUpperCase();
         }
     }
 

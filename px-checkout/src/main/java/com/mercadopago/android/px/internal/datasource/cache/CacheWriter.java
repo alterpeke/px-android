@@ -1,5 +1,6 @@
 package com.mercadopago.android.px.internal.datasource.cache;
 
+import com.mercadopago.android.px.internal.core.FileManager;
 import java.io.File;
 
 /**

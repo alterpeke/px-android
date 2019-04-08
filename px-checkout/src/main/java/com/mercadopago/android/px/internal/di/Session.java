@@ -9,6 +9,7 @@ import com.mercadopago.android.px.configuration.PaymentConfiguration;
 import com.mercadopago.android.px.core.MercadoPagoCheckout;
 import com.mercadopago.android.px.core.SplitPaymentProcessor;
 import com.mercadopago.android.px.internal.configuration.InternalConfiguration;
+import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.AmountConfigurationRepositoryImpl;
 import com.mercadopago.android.px.internal.datasource.AmountService;
 import com.mercadopago.android.px.internal.datasource.BankDealsService;
@@ -56,6 +57,7 @@ import com.mercadopago.android.px.internal.util.RetrofitUtil;
 import com.mercadopago.android.px.internal.util.TextUtil;
 import com.mercadopago.android.px.internal.viewmodel.mappers.BusinessModelMapper;
 import com.mercadopago.android.px.model.Device;
+import com.mercadopago.android.px.tracking.internal.MPTracker;
 
 public final class Session extends ApplicationModule
     implements AmountComponent {
@@ -100,9 +102,12 @@ public final class Session extends ApplicationModule
      * @param mercadoPagoCheckout non mutable checkout intent.
      */
     public void init(@NonNull final MercadoPagoCheckout mercadoPagoCheckout) {
-        //TODO add session mapping object.
         // delete old data.
         clear();
+
+        //start new session id
+        MPTracker.getInstance().setSessionId(getSessionIdProvider().getSessionId());
+
         // Store persistent paymentSetting
         final ConfigurationModule configurationModule = getConfigurationModule();
 
@@ -114,6 +119,7 @@ public final class Session extends ApplicationModule
         paymentSetting.configure(paymentConfiguration);
         resolvePreference(mercadoPagoCheckout, paymentSetting);
         // end Store persistent paymentSetting
+
     }
 
     private void resolvePreference(@NonNull final MercadoPagoCheckout mercadoPagoCheckout,
@@ -176,7 +182,7 @@ public final class Session extends ApplicationModule
     public IESCManager getMercadoPagoESC() {
         final PaymentSettingRepository paymentSettings = getConfigurationModule().getPaymentSettings();
         return new ReflectiveESCManager(getContext(), paymentSettings.getAdvancedConfiguration().isEscEnabled(),
-            "esc-session");
+            getSessionIdProvider().getSessionId());
     }
 
     @NonNull

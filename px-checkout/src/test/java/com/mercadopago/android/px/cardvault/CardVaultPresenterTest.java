@@ -39,7 +39,7 @@ public class CardVaultPresenterTest {
     @Mock private PaymentSettingRepository paymentSettingRepository;
     @Mock private UserSelectionRepository userSelectionRepository;
     @Mock private AmountConfigurationRepository amountConfigurationRepository;
-    @Mock private IESCManager IESCManager;
+    @Mock private IESCManager escManager;
     @Mock private PayerCostSolver payerCostSolver;
 
     @Mock private CardVaultView view;
@@ -48,7 +48,7 @@ public class CardVaultPresenterTest {
     public void setUp() {
         configurePaymentPreferenceMock(null);
 
-        presenter = new CardVaultPresenter(userSelectionRepository, paymentSettingRepository, IESCManager,
+        presenter = new CardVaultPresenter(userSelectionRepository, paymentSettingRepository, escManager,
             amountConfigurationRepository, payerCostSolver);
 
         presenter.setPaymentRecovery(null);
@@ -115,7 +115,7 @@ public class CardVaultPresenterTest {
     public void whenGuessingCardHasInstallmentSelectedAndWithoutTokenThenStartSecurityCodeFlow() {
         configureMockedCardWith();
         final Card card = userSelectionRepository.getCard();
-        when(IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
+        when(escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
             .thenReturn(TextUtil.EMPTY);
 
         presenter.resolveInstallmentsRequest();
@@ -169,7 +169,7 @@ public class CardVaultPresenterTest {
     public void verifyResolvesOnSelectedPayerCostPayerCostListWithoutESC() {
         configureMockedCardWith();
         final Card card = userSelectionRepository.getCard();
-        when(IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
+        when(escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
             .thenReturn(TextUtil.EMPTY);
 
         presenter.onSelectedPayerCost();
@@ -182,7 +182,7 @@ public class CardVaultPresenterTest {
     public void verifyResolvesOnSelectedPayerCostPayerCostListWithESC() {
         configureMockedCardWith();
         final Card card = userSelectionRepository.getCard();
-        when(IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
+        when(escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
             .thenReturn("1");
 
         presenter.onSelectedPayerCost();

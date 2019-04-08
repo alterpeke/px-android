@@ -47,7 +47,7 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
     @NonNull
     private final GroupsRepository groupsRepository;
 
-    @NonNull private final IESCManager IESCManager;
+    @NonNull private final IESCManager escManager;
 
     @NonNull private final PaymentVaultTitleSolver titleSolver;
 
@@ -62,14 +62,14 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
         @NonNull final PluginRepository pluginService,
         @NonNull final DiscountRepository discountRepository,
         @NonNull final GroupsRepository groupsRepository,
-        @NonNull final IESCManager IESCManager,
+        @NonNull final IESCManager escManager,
         @NonNull final PaymentVaultTitleSolver titleSolver) {
         this.paymentSettingRepository = paymentSettingRepository;
         this.userSelectionRepository = userSelectionRepository;
         pluginRepository = pluginService;
         this.discountRepository = discountRepository;
         this.groupsRepository = groupsRepository;
-        this.IESCManager = IESCManager;
+        this.escManager = escManager;
         this.titleSolver = titleSolver;
     }
 
@@ -330,7 +330,7 @@ public class PaymentVaultPresenter extends BasePresenter<PaymentVaultView> imple
 
     private void trackInitialScreen() {
         final SelectMethodView selectMethodView =
-            new SelectMethodView(paymentMethodSearch, IESCManager.getESCCardIds(),
+            new SelectMethodView(paymentMethodSearch, escManager.getESCCardIds(),
                 paymentSettingRepository.getCheckoutPreference());
         setCurrentViewTracker(selectMethodView);
     }

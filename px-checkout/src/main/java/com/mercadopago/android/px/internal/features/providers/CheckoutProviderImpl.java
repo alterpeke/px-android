@@ -25,16 +25,13 @@ public class CheckoutProviderImpl implements CheckoutProvider {
 
     private final Context context;
     private final MercadoPagoServicesAdapter mercadoPagoServicesAdapter;
-    private final IESCManager IESCManager;
     private Handler mHandler;
 
     public CheckoutProviderImpl(@NonNull final Context context,
-        @NonNull String publicKey,
-        @NonNull String privateKey,
-        @NonNull final IESCManager IESCManager) {
+        @NonNull final String publicKey,
+        @NonNull final String privateKey) {
         this.context = context;
         mercadoPagoServicesAdapter = new MercadoPagoServicesAdapter(context, publicKey, privateKey);
-        this.IESCManager = IESCManager;
     }
 
     @Override

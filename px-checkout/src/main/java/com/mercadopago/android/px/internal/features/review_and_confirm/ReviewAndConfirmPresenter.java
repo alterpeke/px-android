@@ -43,8 +43,8 @@ import java.util.Set;
         @NonNull final DiscountRepository discountRepository,
         @NonNull final PaymentSettingRepository paymentSettings,
         @NonNull final UserSelectionRepository userSelectionRepository,
-        @NonNull final IESCManager IESCManager) {
-        final Set<String> escCardIds = IESCManager.getESCCardIds();
+        @NonNull final IESCManager escManager) {
+        final Set<String> escCardIds = escManager.getESCCardIds();
         this.paymentRepository = paymentRepository;
         this.businessModelMapper = businessModelMapper;
         this.paymentSettings = paymentSettings;

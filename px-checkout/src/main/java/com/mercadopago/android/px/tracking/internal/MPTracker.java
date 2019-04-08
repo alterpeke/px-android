@@ -15,8 +15,9 @@ public final class MPTracker {
     private static final String ATTR_EXTRA_INFO = "extra_info";
     private static final String ATTR_FLOW_DETAIL = "flow_detail";
     private static final String ATTR_FLOW_NAME = "flow";
+    private static final String ATTR_SESSION_ID = "session_id";
 
-    private static MPTracker mMPTrackerInstance;
+    private static MPTracker trackerInstance;
 
     @Deprecated
     @Nullable private PXEventListener mPXEventListener;
@@ -32,15 +33,17 @@ public final class MPTracker {
      */
     @Nullable private String flowName;
 
+    @Nullable private String sessionId;
+
     private MPTracker() {
         // do nothing
     }
 
     public static synchronized MPTracker getInstance() {
-        if (mMPTrackerInstance == null) {
-            mMPTrackerInstance = new MPTracker();
+        if (trackerInstance == null) {
+            trackerInstance = new MPTracker();
         }
-        return mMPTrackerInstance;
+        return trackerInstance;
     }
 
     /**
@@ -80,6 +83,15 @@ public final class MPTracker {
      */
     public void setFlowName(@Nullable final String flowName) {
         this.flowName = flowName;
+    }
+
+    /**
+     * Set a session id to identify differents user's session.
+     *
+     * @param sessionId The id that identifies a session
+     */
+    public void setSessionId(@Nullable final String sessionId) {
+        this.sessionId = sessionId;
     }
 
     /**
@@ -140,6 +152,7 @@ public final class MPTracker {
             try {
                 final Map<String, Object> value = (Map<String, Object>) o;
                 value.put(ATTR_FLOW_NAME, flowName);
+                value.put(ATTR_SESSION_ID, sessionId);
             } catch (final ClassCastException e) {
                 // do nothing.
             }
@@ -149,5 +162,6 @@ public final class MPTracker {
     private void addAdditionalFlowInfo(@NonNull final Map<String, Object> data) {
         data.put(ATTR_FLOW_DETAIL, flowDetail);
         data.put(ATTR_FLOW_NAME, flowName);
+        data.put(ATTR_SESSION_ID, sessionId);
     }
 }

@@ -90,8 +90,7 @@ public class CheckoutActivity extends PXActivity implements CheckoutView, Expres
     private void configurePresenter() {
         final CheckoutProvider provider = new CheckoutProviderImpl(this,
             merchantPublicKey,
-            privateKey,
-            Session.getSession(getApplicationContext()).getMercadoPagoESC());
+            privateKey);
 
         presenter.attachResourcesProvider(provider);
         presenter.attachView(this);

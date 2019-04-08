@@ -54,6 +54,7 @@ public class OneTapViewTest {
         data.put("items", Collections.EMPTY_LIST);
         data.put("flow", null);
         data.put("preference_amount", null);
+        data.put("session_id", null);
         data.put("flow_detail", Collections.EMPTY_MAP);
         return data;
     }

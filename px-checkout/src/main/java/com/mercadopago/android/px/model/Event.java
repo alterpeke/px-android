@@ -6,10 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by vaserber on 6/5/17.
- */
-
 public abstract class Event {
 
     //Event Types

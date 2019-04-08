@@ -3,6 +3,7 @@ package com.mercadopago.android.px.internal.di;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.CardAssociationGatewayService;
 import com.mercadopago.android.px.internal.datasource.CardAssociationService;
 import com.mercadopago.android.px.internal.datasource.CardPaymentMethodService;
@@ -46,7 +47,7 @@ public final class CardAssociationSession extends ApplicationModule {
 
     @NonNull
     public IESCManager getMercadoPagoESC() {
-        return new ReflectiveESCManager(getContext(), true, "card-association-session");
+        return new ReflectiveESCManager(getContext(), true, getSessionIdProvider().getSessionId());
     }
 
     @NonNull

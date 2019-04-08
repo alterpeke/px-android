@@ -53,6 +53,7 @@ import com.mercadopago.android.px.internal.features.guessing_card.card_associati
 import com.mercadopago.android.px.internal.features.uicontrollers.card.CardRepresentationModes;
 import com.mercadopago.android.px.internal.features.uicontrollers.card.CardView;
 import com.mercadopago.android.px.internal.features.uicontrollers.card.IdentificationCardView;
+import com.mercadopago.android.px.internal.core.SessionIdProvider;
 import com.mercadopago.android.px.internal.util.ErrorUtil;
 import com.mercadopago.android.px.internal.util.JsonUtil;
 import com.mercadopago.android.px.internal.util.MPAnimationUtils;
@@ -73,6 +74,7 @@ import com.mercadopago.android.px.model.exceptions.ApiException;
 import com.mercadopago.android.px.model.exceptions.CardTokenException;
 import com.mercadopago.android.px.model.exceptions.ExceptionHandler;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
+import com.mercadopago.android.px.tracking.internal.MPTracker;
 import com.mercadopago.android.px.tracking.internal.events.FrictionEventTracker;
 import com.mercadopago.android.px.tracking.internal.views.GuessingRootViewTracker;
 import java.util.List;
@@ -150,7 +152,7 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
     private boolean mActivityActive;
 
     /**
-     * Starts the guessing card flow with the purpose of storing the card in the users card vault This flows does NOT
+     * Starts the guessing card flow with the purpose of storing the card in the users card vault. This flows does NOT
      * includes a payment
      *
      * @param mercadoPagoCardStorage: The mercadoPagoCardStorage that contains a configuration for CardStorage.
@@ -170,7 +172,7 @@ public class GuessingCardActivity extends PXActivity<GuessingCardPresenter> impl
     }
 
     /**
-     * Starts the guessing card flow with the purpose of performing a payment in the endO
+     * Starts the guessing card flow with the purpose of performing a payment in the end.
      *
      * @param callerActivity: the activity that calls this one
      * @param paymentRecovery: payment recovery

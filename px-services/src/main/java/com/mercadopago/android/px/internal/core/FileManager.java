@@ -1,4 +1,4 @@
-package com.mercadopago.android.px.internal.datasource.cache;
+package com.mercadopago.android.px.internal.core;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,8 +22,7 @@ public final class FileManager {
      *
      * @param file The file to write to Disk.
      */
-    /* default */
-    synchronized void writeToFile(final File file, final String fileContent) {
+    public synchronized void writeToFile(final File file, final String fileContent) {
         if (!file.exists()) {
             try {
                 final FileWriter writer = new FileWriter(file);
@@ -43,8 +42,7 @@ public final class FileManager {
      * @param file The file to read from.
      * @return A string with the content of the file.
      */
-    /* default */
-    synchronized String readFileContent(final File file) {
+    public synchronized String readFileContent(final File file) {
         final StringBuilder fileContentBuilder = new StringBuilder();
         if (file.exists()) {
             String stringLine;
@@ -69,8 +67,7 @@ public final class FileManager {
      * @param file The file to check existence.
      * @return true if this file exists, false otherwise.
      */
-    /* default */
-    synchronized boolean exists(final File file) {
+    public synchronized boolean exists(final File file) {
         return file.exists();
     }
 
@@ -81,8 +78,7 @@ public final class FileManager {
      *
      * @param file The directory which its content will be deleted.
      */
-    /* default */
-    synchronized boolean removeFile(final File file) {
+    public synchronized boolean removeFile(final File file) {
         boolean result = false;
         if (file.exists()) {
             result = file.delete();

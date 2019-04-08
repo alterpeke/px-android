@@ -28,7 +28,7 @@ import java.util.List;
 
 public class CardVaultPresenter extends MvpPresenter<CardVaultView, CardVaultProvider> implements PayerCostListener {
 
-    @NonNull /* default */ final IESCManager IESCManager;
+    @NonNull /* default */ final IESCManager escManager;
     @NonNull /* default */ final AmountConfigurationRepository amountConfigurationRepository;
     @NonNull /* default */ final UserSelectionRepository userSelectionRepository;
     @NonNull /* default */ final PaymentSettingRepository paymentSettingRepository;
@@ -56,12 +56,12 @@ public class CardVaultPresenter extends MvpPresenter<CardVaultView, CardVaultPro
 
     public CardVaultPresenter(@NonNull final UserSelectionRepository userSelectionRepository,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
-        @NonNull final IESCManager IESCManager,
+        @NonNull final IESCManager escManager,
         @NonNull final AmountConfigurationRepository amountConfigurationRepository,
         @NonNull final PayerCostSolver payerCostSolver) {
         this.userSelectionRepository = userSelectionRepository;
         this.paymentSettingRepository = paymentSettingRepository;
-        this.IESCManager = IESCManager;
+        this.escManager = escManager;
         this.amountConfigurationRepository = amountConfigurationRepository;
         this.payerCostSolver = payerCostSolver;
     }
@@ -255,7 +255,7 @@ public class CardVaultPresenter extends MvpPresenter<CardVaultView, CardVaultPro
         if (!TextUtil.isEmpty(esc)) {
             return true;
         } else {
-            setESC(IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()));
+            setESC(escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()));
             return !TextUtil.isEmpty(esc);
         }
     }
@@ -271,7 +271,7 @@ public class CardVaultPresenter extends MvpPresenter<CardVaultView, CardVaultPro
                     CardVaultPresenter.this.token = token;
                     CardVaultPresenter.this.token.setLastFourDigits(card.getLastFourDigits());
                     paymentSettingRepository.configure(CardVaultPresenter.this.token);
-                    IESCManager.saveESCWith(token.getCardId(), token.getEsc());
+                    escManager.saveESCWith(token.getCardId(), token.getEsc());
                     if (isViewAttached()) {
                         getView().finishWithResult();
                     }
@@ -281,7 +281,7 @@ public class CardVaultPresenter extends MvpPresenter<CardVaultView, CardVaultPro
                 public void onFailure(final MercadoPagoError error) {
                     if (error.isApiException() &&
                         EscUtil.isInvalidEscForApiException(error.getApiException())) {
-                        IESCManager.deleteESCWith(escCardToken.getCardId());
+                        escManager.deleteESCWith(escCardToken.getCardId());
                         esc = null;
                         //Start CVV screen if fail
                         if (isViewAttached()) {

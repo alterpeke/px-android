@@ -77,12 +77,14 @@ public final class MercadoPagoCheckout {
         final int requestCode) {
 
         initFonts(context);
+        final Session session = Session.getSession(context);
 
         if (!prefetch) {
-            Session.getSession(context).init(this);
+            session.init(this);
         }
 
-        new InitEvent(Session.getSession(context).getConfigurationModule().getPaymentSettings()).track();
+        new InitEvent(session.getConfigurationModule().getPaymentSettings())
+            .track();
 
         if (context instanceof Activity) {
             ((Activity) context).startActivityForResult(checkoutIntent, requestCode);

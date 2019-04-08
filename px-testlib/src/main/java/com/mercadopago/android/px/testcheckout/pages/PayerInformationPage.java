@@ -12,6 +12,7 @@ import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isRoot;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 public class PayerInformationPage extends PageObject<CheckoutValidator> {
 
@@ -26,6 +27,7 @@ public class PayerInformationPage extends PageObject<CheckoutValidator> {
     // Case debit card - a way to resolve this is with a card type
     public PayerInformationPage enterIdentificationTypeAndNumberAndPressNext(@NonNull final String idType,
         @NonNull final String idNumber) {
+        selectIdentificationType(idType);
         typeTextInView(idNumber, com.mercadopago.android.px.R.id.mpsdkCardIdentificationNumber);
         pressNextButton();
         return new PayerInformationPage(validator);
@@ -40,7 +42,13 @@ public class PayerInformationPage extends PageObject<CheckoutValidator> {
     public ReviewAndConfirmPage enterLastNameAndPressNext(@NonNull final String lastName) {
         typeTextInView(lastName, com.mercadopago.android.px.R.id.mpsdkLastName);
         pressNextButton();
-        return new ReviewAndConfirmPage();
+        return new ReviewAndConfirmPage(validator);
+    }
+
+    public ReviewAndConfirmPage enterBusinessNameAndPressNext(@NonNull final String businessName) {
+        typeTextInView(businessName, com.mercadopago.android.px.R.id.mpsdkBusinessName);
+        pressNextButton();
+        return new ReviewAndConfirmPage(validator);
     }
 
     private void pressNextButton() {
@@ -51,6 +59,11 @@ public class PayerInformationPage extends PageObject<CheckoutValidator> {
     private void typeTextInView(final String text, final int mpsdkCardIdentificationNumber) {
         final Matcher<View> viewMatcher = withId(mpsdkCardIdentificationNumber);
         onView(viewMatcher).perform(typeText(text));
+    }
+
+    private void selectIdentificationType(@NonNull final String idType) {
+        onView(withId(com.mercadopago.android.px.R.id.mpsdkCardIdentificationType)).perform(click());
+        onView(withText(idType)).perform(click());
     }
 
     @Override

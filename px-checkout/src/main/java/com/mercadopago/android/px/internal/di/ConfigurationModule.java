@@ -1,6 +1,7 @@
 package com.mercadopago.android.px.internal.di;
 
 import android.content.Context;
+import com.mercadopago.android.px.internal.core.ApplicationModule;
 import com.mercadopago.android.px.internal.datasource.ChargeService;
 import com.mercadopago.android.px.internal.datasource.PaymentSettingService;
 import com.mercadopago.android.px.internal.datasource.UserSelectionService;
