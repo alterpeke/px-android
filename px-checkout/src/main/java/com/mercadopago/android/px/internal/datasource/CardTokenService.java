@@ -38,18 +38,16 @@ public class CardTokenService implements CardTokenRepository {
         return new Callback<Token>() {
             @Override
             public void success(final Token token) {
-                //TODO FIX first digits when them come from backend for saved cards.
-                escManager.saveESCWith("XXXX", cardInfo.getLastFourDigits(), token.getEsc());
+                escManager.saveESCWith(cardInfo.getFirstSixDigits(), cardInfo.getLastFourDigits(), token.getEsc());
                 paymentSettingRepository.configure(token);
                 callback.success(token);
             }
 
             @Override
             public void failure(final ApiException apiException) {
-                //TODO FIX first digits when them come from backend for saved cards.
                 if (EscUtil.isInvalidEscForApiException(apiException)) {
                     paymentSettingRepository.configure((Token) null);
-                    escManager.deleteESCWith("XXXX", cardInfo.getLastFourDigits());
+                    escManager.deleteESCWith(cardInfo.getFirstSixDigits(), cardInfo.getLastFourDigits());
                 }
 
                 callback.failure(apiException);

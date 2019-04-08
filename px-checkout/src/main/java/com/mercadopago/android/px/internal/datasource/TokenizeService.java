@@ -17,16 +17,16 @@ public class TokenizeService implements TokenRepository {
 
     @NonNull private final GatewayService gatewayService;
     @NonNull private final PaymentSettingRepository paymentSettingRepository;
-    @NonNull private final IESCManager IESCManager;
+    @NonNull private final IESCManager escManager;
     @NonNull private final Device device;
 
     public TokenizeService(@NonNull final GatewayService gatewayService,
         @NonNull final PaymentSettingRepository paymentSettingRepository,
-        @NonNull final IESCManager IESCManager,
+        @NonNull final IESCManager escManager,
         @NonNull final Device device) {
         this.gatewayService = gatewayService;
         this.paymentSettingRepository = paymentSettingRepository;
-        this.IESCManager = IESCManager;
+        this.escManager = escManager;
         this.device = device;
     }
 
@@ -36,14 +36,14 @@ public class TokenizeService implements TokenRepository {
             @Override
             public void enqueue(final Callback<Token> callback) {
                 serviceCallWrapp(card.getId(),
-                    IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
+                    escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
                     .enqueue(wrap(card, callback));
             }
 
             @Override
             public void execute(final Callback<Token> callback) {
                 serviceCallWrapp(card.getId(),
-                    IESCManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
+                    escManager.getESC(card.getId(), card.getFirstSixDigits(), card.getLastFourDigits()))
                     .enqueue(wrap(card, callback));
             }
         };
@@ -55,7 +55,7 @@ public class TokenizeService implements TokenRepository {
             public void success(final Token token) {
                 //TODO move to esc manager  / Token repo
                 token.setLastFourDigits(card.getLastFourDigits());
-                IESCManager.saveESCWith(card.getId(), token.getEsc());
+                escManager.saveESCWith(card.getId(), token.getEsc());
                 paymentSettingRepository.configure(token);
                 callback.success(token);
             }
@@ -65,7 +65,7 @@ public class TokenizeService implements TokenRepository {
                 //TODO move to esc manager  / Token repo
                 if (EscUtil.isInvalidEscForApiException(apiException)) {
                     paymentSettingRepository.configure((Token) null);
-                    IESCManager.deleteESCWith(card.getId());
+                    escManager.deleteESCWith(card.getId());
                 }
 
                 callback.failure(apiException);

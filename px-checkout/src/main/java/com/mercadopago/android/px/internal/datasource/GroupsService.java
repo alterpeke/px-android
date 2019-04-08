@@ -30,16 +30,16 @@ public class GroupsService implements GroupsRepository {
     private static final String SEPARATOR = ",";
 
     @NonNull private final PaymentSettingRepository paymentSettingRepository;
-    @NonNull private final IESCManager IESCManager;
+    @NonNull private final IESCManager escManager;
     @NonNull private final CheckoutService checkoutService;
     @NonNull private final String language;
     @NonNull /* default */ final GroupsCache groupsCache;
 
     public GroupsService(@NonNull final PaymentSettingRepository paymentSettingRepository,
-        @NonNull final IESCManager IESCManager, @NonNull final CheckoutService checkoutService,
+        @NonNull final IESCManager escManager, @NonNull final CheckoutService checkoutService,
         @NonNull final String language, @NonNull final GroupsCache groupsCache) {
         this.paymentSettingRepository = paymentSettingRepository;
-        this.IESCManager = IESCManager;
+        this.escManager = escManager;
         this.checkoutService = checkoutService;
         this.language = language;
         this.groupsCache = groupsCache;
@@ -108,7 +108,7 @@ public class GroupsService implements GroupsRepository {
 
         final String excludedPaymentMethodsAppended =
             getListAsString(checkoutPreference.getExcludedPaymentMethods());
-        final String cardsWithEscAppended = getListAsString(new ArrayList<>(IESCManager.getESCCardIds()));
+        final String cardsWithEscAppended = getListAsString(new ArrayList<>(escManager.getESCCardIds()));
 
         final Integer differentialPricingId =
             checkoutPreference.getDifferentialPricing() != null ? checkoutPreference.getDifferentialPricing()
