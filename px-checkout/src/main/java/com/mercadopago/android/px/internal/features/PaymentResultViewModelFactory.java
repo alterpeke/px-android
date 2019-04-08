@@ -206,7 +206,10 @@ public final class PaymentResultViewModelFactory {
                 .setTitleResId(R.string.px_text_insufficient_amount)
                 .setLinkAction(null)
                 .setMainActionTitle(R.string.px_change_payment)
-                .setHasDetail(false);
+                .setBodyTitleResId(R.string.px_what_can_do)
+                .setBodyDetailDescriptionResId(R.string.px_text_insufficient_amount_title_description)
+                .setDescriptionResId(R.string.px_error_description_rejected_by_insufficient_amount)
+                .setHasDetail(true);
         case STATUS_DETAIL_CC_REJECTED_CARD_DISABLED:
             setRecoverableErrorResources(builder);
             return builder

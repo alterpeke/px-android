@@ -123,7 +123,8 @@
     <string name="px_title_bad_filled_other">One of the card\'s details is invalid</string>
     <string name="px_text_how_can_authorize">How do I authorize it?</string>
     <string name="px_text_some_card_data_is_incorrect">One of the card\'s details is invalid</string>
-    <string name="px_text_insufficient_amount">Your card does not have sufficient funds</string>
+    <string name="px_text_insufficient_amount">Your card rejected the payment</string>
+    <string name="px_text_insufficient_amount_title_description">Your funds are insufficient or you exceeded the purchase limit.</string>
     <string name="px_text_active_card">Your card is not activated</string>
     <string name="px_title_rejection_high_risk">We rejected your payment</string>
     <string name="px_title_rejection_account_high_risk">You cannot use your money in Mercado Pago for this payment</string>
@@ -143,6 +144,7 @@
     <string name="px_error_description_rejected_by_regulations">To pay with account money you must complete the missing details.</string>
     <string name="px_text_card_data_invalid">Review card data</string>
     <string name="px_text_card_enabled">I already enabled my card</string>
+    <string name="px_error_description_rejected_by_insufficient_amount">Try paying with a different payment method.</string>
 
     <!-- Error messages -->
     <string name="px_error_message_invalid_item">Invalid item</string>
@@ -272,5 +274,5 @@
     <string name="px_dialog_detail_payment_method_disable_card_title">This card is currently unavailable</string>
     <string name="px_dialog_detail_payment_method_disable_account_money_title">Your money in Mercado Pago is currently unavailable</string>
     <string name="px_dialog_detail_payment_method_disable_detail">Don’t worry, you can use another method to complete the payment.</string>
-    <string name="px_dialog_detail_payment_method_disable_link">Pay with a different method</string>
+    <string name="px_dialog_detail_payment_method_disable_link">Pay using a different method</string>
 </resources>

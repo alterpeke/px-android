@@ -114,7 +114,8 @@
     <string name="px_title_bad_filled_other">Algum dado do cartão está incorreto</string>
     <string name="px_text_how_can_authorize">Como posso autorizá-lo?</string>
     <string name="px_text_some_card_data_is_incorrect">Algum dado do cartão está incorreto</string>
-    <string name="px_text_insufficient_amount">Não há limite suficiente no seu cartão</string>
+    <string name="px_text_insufficient_amount">Seu cartão recusou o pagamento</string>
+    <string name="px_text_insufficient_amount_title_description">Seus fundos são insuficientes ou você excedeu o limite de compra.</string>
     <string name="px_text_active_card">Seu cartão não está desbloqueado</string>
     <string name="px_title_rejection_high_risk">Recusamos seu pagamento</string>
     <string name="px_title_rejection_account_high_risk">Você não pode usar seu dinheiro no Mercado Pago para este pagamento</string>
@@ -134,6 +135,7 @@
     <string name="px_error_description_high_risk">Tente pagar com outro meio.</string>
     <string name="px_error_description_rejected_by_regulations">Para pagar com dinheiro em conta, você deve preencher os dados faltantes.</string>
     <string name="px_text_card_enabled">Já desbloqueei o cartão </string>
+    <string name="px_error_description_rejected_by_insufficient_amount">Não desanime! Verifique com seu cartão se você tiver saldo ou limite disponível. \n\n Se preferir, você pode escolher outro meio de pagamento.</string>
 
     <!-- Error messages -->
     <string name="px_error_message_invalid_item">Item inválido</string>

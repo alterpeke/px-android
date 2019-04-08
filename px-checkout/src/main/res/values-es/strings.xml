@@ -115,7 +115,8 @@
     <string name="px_text_card_enabled">Ya activé mi tarjeta</string>
     <string name="px_title_bad_filled_other">Algún dato de la tarjeta es inválido</string>
     <string name="px_text_how_can_authorize">¿Cómo lo autorizo?</string>
-    <string name="px_text_insufficient_amount">Tu tarjeta no tiene límite suficiente</string>
+    <string name="px_text_insufficient_amount">Tu tarjeta rechazó el pago</string>
+    <string name="px_text_insufficient_amount_title_description">Tus fondos son insuficientes o superaste el límite de compra.</string>
     <string name="px_text_active_card">Tu tarjeta no está activada</string>
     <string name="px_title_rejection_high_risk">Rechazamos tu pago</string>
     <string name="px_title_rejection_account_high_risk">No puedes usar tu dinero en Mercado Pago para este pago</string>
@@ -133,6 +134,7 @@
     <string name="px_error_description_max_attempts">Como llegaste al límite de intentos con esta tarjeta, usa otro medio de pago.</string>
     <string name="px_error_description_high_risk">Intenta pagar con otro medio.</string>
     <string name="px_error_description_rejected_by_regulations">Para pagar con dinero en cuenta debes completar los datos faltantes.</string>
+    <string name="px_error_description_rejected_by_insufficient_amount">¡No te desanimes! Consulta con tu tarjeta si tienes saldo o límite disponible. \n\n Si prefieres, puedes elegir otro medio de pago.</string>
 
     <!-- Error messages -->
     <string name="px_error_message_invalid_item">Item inválido</string>

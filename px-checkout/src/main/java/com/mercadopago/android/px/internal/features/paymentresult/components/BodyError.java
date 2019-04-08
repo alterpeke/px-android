@@ -33,6 +33,12 @@ public class BodyError extends Component<BodyErrorProps, Void> {
         return viewModel.getDescription(context);
     }
 
+    public String getTitleDescription(final Context context) {
+        final PaymentResultViewModel viewModel = PaymentResultViewModelFactory
+            .createPaymentStatusWithProps(props.status, props.statusDetail, props);
+        return viewModel.getTitleDescription(context);
+    }
+
     /* default */ void recoverPayment() {
         getDispatcher().dispatch(new RecoverPaymentAction());
     }

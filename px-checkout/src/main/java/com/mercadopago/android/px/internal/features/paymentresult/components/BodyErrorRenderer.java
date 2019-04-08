@@ -19,12 +19,14 @@ public class BodyErrorRenderer extends Renderer<BodyError> {
         final ViewGroup bodyViewGroup = bodyErrorView.findViewById(R.id.bodyErrorContainer);
         final MPTextView titleTextView = bodyErrorView.findViewById(R.id.paymentResultBodyErrorTitle);
         final MPTextView descriptionTextView = bodyErrorView.findViewById(R.id.paymentResultBodyErrorDescription);
+        final MPTextView titleDescriptionTextView = bodyErrorView.findViewById(R.id.paymentResultBodyErrorTitleDescription);
         final AppCompatButton actionButton = bodyErrorView.findViewById(R.id.paymentResultBodyErrorAction);
         final View middleDivider = bodyErrorView.findViewById(R.id.bodyErrorMiddleDivider);
         final MPTextView secondaryTitleTextView = bodyErrorView.findViewById(R.id.bodyErrorSecondaryTitle);
         final View bottomDivider = bodyErrorView.findViewById(R.id.bodyErrorBottomDivider);
 
         setText(titleTextView, component.getTitle(context));
+        setText(titleDescriptionTextView, component.getTitleDescription(context));
         setText(descriptionTextView, component.getDescription(context));
 
         if (component.getTitle(context).isEmpty()) {

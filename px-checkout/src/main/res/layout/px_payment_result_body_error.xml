@@ -20,6 +20,17 @@
         android:paddingStart="@dimen/px_xl_margin">
 
         <com.mercadopago.android.px.internal.view.MPTextView
+            android:id="@+id/paymentResultBodyErrorTitleDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/px_xs_margin"
+            android:gravity="center_horizontal"
+            android:textColor="@color/ui_meli_dark_grey"
+            android:textSize="@dimen/px_s_text"
+            tools:text="Description"/>
+
+        <com.mercadopago.android.px.internal.view.MPTextView
             android:id="@+id/paymentResultBodyErrorTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

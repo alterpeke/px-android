@@ -30,6 +30,7 @@ public class BodyErrorTest {
     private static final String REVIEW_MANUAL_DESCRIPTION = "review_manual_description";
     private static final String CALL_FOR_AUTH_DESCRIPTION = "call_for_auth_description";
     private static final String REJECTED_INSUFFICIENT_DATA = "insufficient_data_description";
+    private static final String REJECTED_INSUFFICIENT_AMOUNT = "insufficient_amount_description";
     private static final String DUPLICATED_DESCRIPTION = "duplicated_description";
     private static final String MAX_ATTEMPTS_DESCRIPTION = "max_attempt_description";
     private static final String EMPTY_DESCRIPTION = TextUtil.EMPTY;
@@ -48,6 +49,7 @@ public class BodyErrorTest {
         when(context.getString(R.string.px_error_description_call)).thenReturn(CALL_FOR_AUTH_DESCRIPTION);
         when(context.getString(R.string.px_error_description_duplicated_payment)).thenReturn(DUPLICATED_DESCRIPTION);
         when(context.getString(R.string.px_error_description_max_attempts)).thenReturn(MAX_ATTEMPTS_DESCRIPTION);
+        when(context.getString(R.string.px_error_description_rejected_by_insufficient_amount)).thenReturn(REJECTED_INSUFFICIENT_AMOUNT);
 
 
     }
@@ -65,7 +67,7 @@ public class BodyErrorTest {
         final PaymentResult paymentResult = PaymentResults.getStatusRejectedInsufficientAmountPaymentResult();
         final BodyError bodyError = new BodyError(getBodyErrorProps(paymentResult), dispatcher);
 
-        assertEquals(TextUtil.EMPTY, bodyError.getTitle(context));
+        assertEquals(ERROR_TITLE, bodyError.getTitle(context));
     }
 
     @Test
@@ -137,7 +139,7 @@ public class BodyErrorTest {
         final PaymentResult paymentResult = PaymentResults.getStatusRejectedInsufficientAmountPaymentResult();
         final BodyError bodyError = new BodyError(getBodyErrorProps(paymentResult), dispatcher);
 
-        assertEquals(EMPTY_DESCRIPTION, bodyError.getDescription(context));
+        assertEquals(REJECTED_INSUFFICIENT_AMOUNT, bodyError.getDescription(context));
     }
 
     @Test

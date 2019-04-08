@@ -11,6 +11,7 @@ public final class PaymentResultViewModel {
     private final int titleResId;
     private final int labelResId;
     private final int bodyTitleResId;
+    private final int titleDescriptionResId;
     private final boolean hasDetail;
     private final boolean isRecoverable;
     private final boolean isSuccess;
@@ -42,6 +43,7 @@ public final class PaymentResultViewModel {
         isPendingSuccess = builder.isPendingSuccess;
         descriptionResId = builder.descriptionResId;
         bodyTitleResId = builder.bodyTitleResId;
+        titleDescriptionResId = builder.titleDescriptionResId;
         backgroundResId = builder.backgroundResId;
         statusBarResId = builder.statusBarResId;
         badgeResId = builder.badgeResId;
@@ -125,11 +127,16 @@ public final class PaymentResultViewModel {
         return badgeResId;
     }
 
+    public String getTitleDescription(@NonNull final Context context) {
+        return titleDescriptionResId == 0 ? TextUtil.EMPTY : context.getString(titleDescriptionResId);
+    }
+
     public static class Builder {
         int titleResId;
         int labelResId;
         int descriptionResId;
         int bodyTitleResId;
+        int titleDescriptionResId;
         boolean isRecoverable;
         boolean hasDetail;
         boolean isApprovedSuccess;
@@ -209,6 +216,11 @@ public final class PaymentResultViewModel {
 
         public Builder setBodyTitleResId(final int bodyTitleResId) {
             this.bodyTitleResId = bodyTitleResId;
+            return this;
+        }
+
+        public Builder setBodyDetailDescriptionResId(final int titleDescriptionResId) {
+            this.titleDescriptionResId = titleDescriptionResId;
             return this;
         }
 

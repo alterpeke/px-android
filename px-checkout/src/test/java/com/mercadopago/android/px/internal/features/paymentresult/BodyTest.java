@@ -89,7 +89,7 @@ public class BodyTest {
         final Body body = new Body(getBodyPropsForOnPayment(paymentResult),
             dispatcher);
 
-        Assert.assertFalse(body.hasBodyError());
+        Assert.assertTrue(body.hasBodyError());
     }
 
     @Test
