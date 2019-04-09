@@ -19,9 +19,10 @@ import com.mercadopago.android.px.internal.view.AmountDescriptorView;
 import com.mercadopago.android.px.internal.view.ElementDescriptorView;
 import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
+import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.PayerCostSelection;
-import com.mercadopago.android.px.internal.viewmodel.PaymentMethodIdSelection;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
+import com.mercadopago.android.px.internal.viewmodel.mappers.ConfirmButtonViewModelMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDrawableItemMapper;
@@ -55,10 +56,6 @@ import java.util.Set;
     private static final String BUNDLE_STATE_PAYER_COST =
         "com.mercadopago.android.px.internal.features.express.PAYER_COST";
     /* default */ PayerCostSelection payerCostSelection;
-
-    private static final String BUNDLE_STATE_PAYMENT_METHOD_IDS =
-        "com.mercadopago.android.px.internal.features.express.PM_IDS";
-    /* default */ PaymentMethodIdSelection paymentMethodIdSelection;
 
     private static final String BUNDLE_STATE_SPLIT_PREF =
         "com.mercadopago.android.px.internal.features.express.SPLIT_PREF";
@@ -101,7 +98,6 @@ import java.util.Set;
                 expressMetadataList = paymentMethodSearch.getExpress();
                 //Plus one to compensate for add new payment method
                 payerCostSelection = createNewPayerCostSelected();
-                paymentMethodIdSelection = new PaymentMethodIdSelection(expressMetadataList);
                 cardsWithSplit = paymentMethodSearch.getIdsWithSplitAllowed();
             }
 
@@ -132,7 +128,11 @@ import java.util.Set;
                 amountConfigurationRepository)
                 .map(expressMetadataList);
 
-        final HubAdapter.Model model = new HubAdapter.Model(paymentModels, summaryModels, splitHeaderModels);
+        final List<ConfirmButtonViewModel> confirmButtonViewModels =
+            new ConfirmButtonViewModelMapper(disabledPaymentMethodRepository).map(expressMetadataList);
+
+        final HubAdapter.Model model =
+            new HubAdapter.Model(paymentModels, summaryModels, splitHeaderModels, confirmButtonViewModels);
 
         getView().showToolbarElementDescriptor(elementDescriptorModel);
 
@@ -161,7 +161,6 @@ import java.util.Set;
     public void recoverFromBundle(@NonNull final Bundle bundle) {
         payerCostSelection = bundle.getParcelable(BUNDLE_STATE_PAYER_COST);
         isSplitUserPreference = bundle.getBoolean(BUNDLE_STATE_SPLIT_PREF, false);
-        paymentMethodIdSelection = bundle.getParcelable(BUNDLE_STATE_PAYMENT_METHOD_IDS);
     }
 
     @NonNull
@@ -169,7 +168,6 @@ import java.util.Set;
     public Bundle storeInBundle(@NonNull final Bundle bundle) {
         bundle.putParcelable(BUNDLE_STATE_PAYER_COST, payerCostSelection);
         bundle.putBoolean(BUNDLE_STATE_SPLIT_PREF, isSplitUserPreference);
-        bundle.putParcelable(BUNDLE_STATE_PAYMENT_METHOD_IDS, paymentMethodIdSelection);
         return bundle;
     }
 
@@ -325,8 +323,7 @@ import java.util.Set;
     @Override
     public void updateElementPosition(final int paymentMethodIndex) {
         getView().updateViewForPosition(paymentMethodIndex, payerCostSelection.get(paymentMethodIndex),
-            isSplitUserPreference,
-            disabledPaymentMethodRepository.hasPaymentMethodId(paymentMethodIdSelection.get(paymentMethodIndex)));
+            isSplitUserPreference);
     }
 
     /**

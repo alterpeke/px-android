@@ -53,7 +53,7 @@ public interface ExpressPayment {
 
         void updateViewForPosition(final int paymentMethodIndex,
             final int payerCostSelected,
-            final boolean isSplitUserPreference, final boolean isPaymentMethodDisabled);
+            final boolean isSplitUserPreference);
 
         void showInstallmentsList(List<PayerCost> payerCostList, final int payerCostSelected);
 

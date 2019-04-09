@@ -25,8 +25,7 @@ public class PaymentMethodHeaderAdapter
     }
 
     @Override
-    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit,
-        final boolean isPaymentMethodDisabled) {
+    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit) {
         this.currentIndex = currentIndex;
         PaymentMethodDescriptorView.Model currentModel = data.get(currentIndex);
         view.showTitlePager(currentModel.hasPayerCostList() && !currentModel.isDisabledPaymentMethod());

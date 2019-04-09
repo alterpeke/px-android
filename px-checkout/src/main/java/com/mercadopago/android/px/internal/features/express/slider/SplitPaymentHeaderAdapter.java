@@ -97,8 +97,7 @@ public class SplitPaymentHeaderAdapter extends ViewAdapter<List<SplitPaymentHead
     }
 
     @Override
-    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit,
-        final boolean isPaymentMethodDisabled) {
+    public void updateData(final int currentIndex, final int payerCostSelected, final boolean userWantsToSplit) {
         // Empty data case
         if (currentIndex >= data.size()) {
             new Empty().visit(view);

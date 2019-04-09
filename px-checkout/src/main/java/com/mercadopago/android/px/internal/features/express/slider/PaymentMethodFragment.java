@@ -17,7 +17,7 @@ public abstract class PaymentMethodFragment extends Fragment {
     protected static final String ARG_MODEL = "ARG_MODEL";
     protected static final String ARG_PM_TYPE = "ARG_PM_TYPE";
 
-    protected OnClickPaymentMethodListener handler;
+    protected PaymentMethodSelectionHandler handler;
     private View badge;
     private CardView card;
 
@@ -59,12 +59,12 @@ public abstract class PaymentMethodFragment extends Fragment {
     public void onAttach(final Context context) {
         super.onAttach(context);
         final Fragment parentFragment = getParentFragment();
-        if (parentFragment instanceof OnClickPaymentMethodListener) {
-            handler = (OnClickPaymentMethodListener) parentFragment;
+        if (parentFragment instanceof PaymentMethodSelectionHandler) {
+            handler = (PaymentMethodSelectionHandler) parentFragment;
         }
     }
 
-    public interface OnClickPaymentMethodListener {
+    public interface PaymentMethodSelectionHandler {
         void onPaymentMethodClicked(@NonNull final String paymentMethodType);
         void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item);
     }

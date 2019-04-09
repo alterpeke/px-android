@@ -25,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
 import com.mercadolibre.android.ui.widgets.MeliButton;
 import com.mercadolibre.android.ui.widgets.MeliSnackbar;
 import com.mercadopago.android.px.R;
@@ -71,7 +70,6 @@ import com.mercadopago.android.px.model.PayerCost;
 import com.mercadopago.android.px.model.PaymentRecovery;
 import com.mercadopago.android.px.model.Site;
 import com.mercadopago.android.px.model.exceptions.MercadoPagoError;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -86,7 +84,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     SummaryView.OnFitListener,
     ExplodingFragment.ExplodingAnimationListener,
     SplitPaymentHeaderAdapter.SplitListener,
-    PaymentMethodFragment.OnClickPaymentMethodListener {
+    PaymentMethodFragment.PaymentMethodSelectionHandler {
 
     private static final String TAG_EXPLODING_FRAGMENT = "TAG_EXPLODING_FRAGMENT";
     private static final int REQ_CODE_CARD_VAULT = 0x999;
@@ -343,7 +341,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
             new SummaryViewAdapter(model.summaryViewModels, summaryView),
             new SplitPaymentHeaderAdapter(model.splitModels, splitPaymentView, this),
             new PaymentMethodHeaderAdapter(model.paymentMethodDescriptorModels, paymentMethodHeaderView),
-            new ConfirmButtonAdapter(model.paymentMethodDescriptorModels.size(), confirmButton)
+            new ConfirmButtonAdapter(model.confirmButtonViewModels, confirmButton)
         ));
     }
 
@@ -434,8 +432,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     @Override
     public void updateViewForPosition(final int paymentMethodIndex,
         final int payerCostSelected,
-        final boolean isSplitUserPreference, final boolean isPaymentMethodDisabled) {
-        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, isSplitUserPreference, isPaymentMethodDisabled);
+        final boolean isSplitUserPreference) {
+        hubAdapter.updateData(paymentMethodIndex, payerCostSelected, isSplitUserPreference);
     }
 
     //TODO refactor
