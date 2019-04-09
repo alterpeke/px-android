@@ -31,7 +31,6 @@ import com.mercadopago.android.px.R;
 import com.mercadopago.android.px.internal.di.Session;
 import com.mercadopago.android.px.internal.features.CheckoutActivity;
 import com.mercadopago.android.px.internal.features.Constants;
-import com.mercadopago.android.px.internal.features.disable_payment_method.DisabledPaymentMethodDetailDialog;
 import com.mercadopago.android.px.internal.features.explode.ExplodeDecorator;
 import com.mercadopago.android.px.internal.features.explode.ExplodeParams;
 import com.mercadopago.android.px.internal.features.explode.ExplodingFragment;
@@ -41,7 +40,6 @@ import com.mercadopago.android.px.internal.features.express.animations.SlideAnim
 import com.mercadopago.android.px.internal.features.express.installments.InstallmentsAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.ConfirmButtonAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.HubAdapter;
-import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragment;
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodFragmentAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.PaymentMethodHeaderAdapter;
 import com.mercadopago.android.px.internal.features.express.slider.SplitPaymentHeaderAdapter;
@@ -83,8 +81,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     InstallmentsAdapter.ItemListener,
     SummaryView.OnFitListener,
     ExplodingFragment.ExplodingAnimationListener,
-    SplitPaymentHeaderAdapter.SplitListener,
-    PaymentMethodFragment.PaymentMethodSelectionHandler {
+    SplitPaymentHeaderAdapter.SplitListener {
 
     private static final String TAG_EXPLODING_FRAGMENT = "TAG_EXPLODING_FRAGMENT";
     private static final int REQ_CODE_CARD_VAULT = 0x999;
@@ -129,16 +126,6 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     public void onSplitChanged(final boolean isChecked) {
         final int currentItem = paymentMethodPager.getCurrentItem();
         presenter.onSplitChanged(isChecked, currentItem);
-    }
-
-    @Override
-    public void onPaymentMethodClicked(@NonNull final String paymentMethodType) {
-        DisabledPaymentMethodDetailDialog.showDialog(getChildFragmentManager(), paymentMethodType);
-    }
-
-    @Override
-    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
-        presenter.updateDrawableFragmentItem(item);
     }
 
     public interface CallBack {

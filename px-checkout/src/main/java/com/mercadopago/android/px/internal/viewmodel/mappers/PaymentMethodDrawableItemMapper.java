@@ -1,7 +1,6 @@
 package com.mercadopago.android.px.internal.viewmodel.mappers;
 
 import android.support.annotation.NonNull;
-import com.mercadopago.android.px.internal.repository.DisabledPaymentMethodRepository;
 import com.mercadopago.android.px.internal.viewmodel.drawables.AccountMoneyDrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.AddNewCardFragmentDrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
@@ -23,7 +22,7 @@ public class PaymentMethodDrawableItemMapper extends Mapper<List<ExpressMetadata
                     expressMetadata.getCard().getDisplayInfo(), expressMetadata.getCard().getId()));
             } else if (PaymentTypes.isAccountMoney(expressMetadata.getPaymentMethodId())) {
                 result.add(new AccountMoneyDrawableFragmentItem(expressMetadata.getAccountMoney(),
-                        expressMetadata.getPaymentMethodId()));
+                    expressMetadata.getPaymentMethodId()));
             }
         }
 

@@ -21,7 +21,6 @@ import com.mercadopago.android.px.internal.view.PaymentMethodDescriptorView;
 import com.mercadopago.android.px.internal.view.SummaryView;
 import com.mercadopago.android.px.internal.viewmodel.ConfirmButtonViewModel;
 import com.mercadopago.android.px.internal.viewmodel.PayerCostSelection;
-import com.mercadopago.android.px.internal.viewmodel.drawables.DrawableFragmentItem;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ConfirmButtonViewModelMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.ElementDescriptorMapper;
 import com.mercadopago.android.px.internal.viewmodel.mappers.PaymentMethodDescriptorMapper;
@@ -62,6 +61,11 @@ import java.util.Set;
     private static final String BUNDLE_STATE_SPLIT_PREF =
         "com.mercadopago.android.px.internal.features.express.SPLIT_PREF";
     /* default */ boolean isSplitUserPreference = false;
+
+    private static final String BUNDLE_STATE_AVAILABLE_PM_COUNT =
+        "com.mercadopago.android.px.internal.features.express.AVAILABLE_PM_COUNT";
+    private static final int NOT_INITIALIZED_CUOUNT_VALUE = -1;
+    private int availablePaymentMethodsCount = NOT_INITIALIZED_CUOUNT_VALUE;
 
     @NonNull private final PaymentRepository paymentRepository;
     @NonNull private final AmountRepository amountRepository;
@@ -113,6 +117,11 @@ import java.util.Set;
     @Override
     public void attachView(final ExpressPayment.View view) {
         super.attachView(view);
+        loadViewModel();
+    }
+
+    private void loadViewModel() {
+        availablePaymentMethodsCount = countAvailablePaymentMethods();
 
         final SummaryInfo summaryInfo = new SummaryInfoMapper().map(paymentConfiguration.getCheckoutPreference());
 
@@ -153,6 +162,26 @@ import java.util.Set;
             cancelLoading();
         }
         paymentRepository.attach(this);
+        if (shouldReloadModel()) {
+            loadViewModel();
+        }
+    }
+
+    private boolean shouldReloadModel() {
+        final int currentAvailablePaymentMethodsCount = countAvailablePaymentMethods();
+        return availablePaymentMethodsCount != currentAvailablePaymentMethodsCount;
+    }
+
+    private int countAvailablePaymentMethods() {
+        int currentAvailablePaymentMethodsCount = expressMetadataList.size();
+        for (final ExpressMetadata expressMetadata : expressMetadataList) {
+            if ((expressMetadata.isCard() &&
+                disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getCard().getId())) ||
+                disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getPaymentMethodId())) {
+                currentAvailablePaymentMethodsCount--;
+            }
+        }
+        return currentAvailablePaymentMethodsCount;
     }
 
     @Override
@@ -165,6 +194,9 @@ import java.util.Set;
     public void recoverFromBundle(@NonNull final Bundle bundle) {
         payerCostSelection = bundle.getParcelable(BUNDLE_STATE_PAYER_COST);
         isSplitUserPreference = bundle.getBoolean(BUNDLE_STATE_SPLIT_PREF, false);
+        if (availablePaymentMethodsCount == NOT_INITIALIZED_CUOUNT_VALUE) {
+            availablePaymentMethodsCount = bundle.getInt(BUNDLE_STATE_AVAILABLE_PM_COUNT);
+        }
     }
 
     @NonNull
@@ -172,6 +204,7 @@ import java.util.Set;
     public Bundle storeInBundle(@NonNull final Bundle bundle) {
         bundle.putParcelable(BUNDLE_STATE_PAYER_COST, payerCostSelection);
         bundle.putBoolean(BUNDLE_STATE_SPLIT_PREF, isSplitUserPreference);
+        bundle.putInt(BUNDLE_STATE_AVAILABLE_PM_COUNT, availablePaymentMethodsCount);
         return bundle;
     }
 
@@ -384,11 +417,6 @@ import java.util.Set;
         // cancel also update the position.
         // it is used because the installment selection can be expanded by the user.
         onInstallmentSelectionCanceled(currentItem);
-    }
-
-    @Override
-    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
-        item.setDisabled(disabledPaymentMethodRepository.hasPaymentMethodId(item.getId()));
     }
 
     @NonNull

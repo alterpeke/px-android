@@ -43,7 +43,7 @@ public class AccountMoneyFragment extends PaymentMethodFragment {
             final TextView message = view.findViewById(R.id.label);
             setMessage(message, model.metadata);
         } else {
-            throw new IllegalStateException("AccountMoneyFragment does not contains model info");
+            throw new IllegalStateException("AccountMoneyFragment does not contain model info");
         }
     }
 

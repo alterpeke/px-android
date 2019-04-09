@@ -7,9 +7,9 @@ import java.io.Serializable;
 public abstract class DrawableFragmentItem implements Serializable {
 
     protected String id;
-    protected boolean disabled;
+    private boolean disabled;
 
-    abstract public Fragment draw(@NonNull final PaymentMethodFragmentDrawer drawer);
+    public abstract Fragment draw(@NonNull final PaymentMethodFragmentDrawer drawer);
 
     public String getId() {
         return id;
