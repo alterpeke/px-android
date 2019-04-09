@@ -3,7 +3,6 @@ package com.mercadopago.android.px.internal.features.express.animations;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
-import com.mercadopago.android.px.internal.util.ViewUtils;
 
 public class HideViewOnAnimationListener implements Animation.AnimationListener {
 
