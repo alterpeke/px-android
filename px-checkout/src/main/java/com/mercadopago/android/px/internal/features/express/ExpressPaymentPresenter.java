@@ -382,11 +382,6 @@ import java.util.Set;
         onInstallmentSelectionCanceled(currentItem);
     }
 
-    @Override
-    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
-        item.setDisabled(disabledPaymentMethodRepository.hasPaymentMethodId(item.getId()));
-    }
-
     @NonNull
     private PayerCostSelection createNewPayerCostSelected() {
         return new PayerCostSelection(expressMetadataList.size() + 1);

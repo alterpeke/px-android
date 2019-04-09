@@ -83,8 +83,7 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     InstallmentsAdapter.ItemListener,
     SummaryView.OnFitListener,
     ExplodingFragment.ExplodingAnimationListener,
-    SplitPaymentHeaderAdapter.SplitListener,
-    PaymentMethodFragment.PaymentMethodSelectionHandler {
+    SplitPaymentHeaderAdapter.SplitListener {
 
     private static final String TAG_EXPLODING_FRAGMENT = "TAG_EXPLODING_FRAGMENT";
     private static final int REQ_CODE_CARD_VAULT = 0x999;
@@ -129,16 +128,6 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
     public void onSplitChanged(final boolean isChecked) {
         final int currentItem = paymentMethodPager.getCurrentItem();
         presenter.onSplitChanged(isChecked, currentItem);
-    }
-
-    @Override
-    public void onPaymentMethodClicked(@NonNull final String paymentMethodType) {
-        DisabledPaymentMethodDetailDialog.showDialog(getChildFragmentManager(), paymentMethodType);
-    }
-
-    @Override
-    public void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item) {
-        presenter.updateDrawableFragmentItem(item);
     }
 
     public interface CallBack {

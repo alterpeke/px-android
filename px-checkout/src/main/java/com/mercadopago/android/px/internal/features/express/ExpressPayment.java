@@ -95,7 +95,5 @@ public interface ExpressPayment {
         void manageNoConnection();
 
         void onSplitChanged(boolean isChecked, int currentItem);
-
-        void updateDrawableFragmentItem(@NonNull DrawableFragmentItem item);
     }
 }
