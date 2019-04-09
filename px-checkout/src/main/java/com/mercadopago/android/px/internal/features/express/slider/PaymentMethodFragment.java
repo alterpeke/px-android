@@ -29,11 +29,6 @@ public abstract class PaymentMethodFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         final Bundle arguments = getArguments();
