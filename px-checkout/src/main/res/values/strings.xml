@@ -274,5 +274,5 @@
     <string name="px_dialog_detail_payment_method_disable_card_title">This card is currently unavailable</string>
     <string name="px_dialog_detail_payment_method_disable_account_money_title">Your money in Mercado Pago is currently unavailable</string>
     <string name="px_dialog_detail_payment_method_disable_detail">Don’t worry, you can use another method to complete the payment.</string>
-    <string name="px_dialog_detail_payment_method_disable_link">Pay using a different method</string>
+    <string name="px_dialog_detail_payment_method_disable_link">Pay with a different method</string>
 </resources>
