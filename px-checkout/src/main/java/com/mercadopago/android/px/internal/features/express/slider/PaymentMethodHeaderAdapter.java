@@ -43,7 +43,7 @@ public class PaymentMethodHeaderAdapter
             final PaymentMethodDescriptorView.Model nextModel = data.get(nextIndex);
             final PaymentMethodHeaderView.Model viewModel = new PaymentMethodHeaderView.Model(goingTo,
                 currentModel.hasPayerCostList() && !currentModel.isDisabledPaymentMethod(),
-                nextModel.hasPayerCostList() && nextModel.isDisabledPaymentMethod());
+                nextModel.hasPayerCostList() && !nextModel.isDisabledPaymentMethod());
             view.updateArrowVisibility(positionOffset, viewModel);
         }
     }
