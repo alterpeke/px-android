@@ -69,7 +69,6 @@
             android:id="@+id/installments_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/transparent"
             android:layout_alignBottom="@id/space"/>
 
         <android.support.v4.widget.Space
