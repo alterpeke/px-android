@@ -223,7 +223,8 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
                 public void onGlobalLayout() {
                     if (pagerAndConfirmButtonContainer.getHeight() > 0) {
                         final ViewGroup.LayoutParams params = installmentsRecyclerView.getLayoutParams();
-                        params.height = pagerAndConfirmButtonContainer.getHeight();
+                        params.height = pagerAndConfirmButtonContainer.getHeight() - (int)
+                            getContext().getResources().getDimension(R.dimen.px_badge_offset);
                         installmentsRecyclerView.setLayoutParams(params);
                         pagerAndConfirmButtonContainer.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
@@ -361,7 +362,6 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         installmentsAdapter.setPayerCostSelected(payerCostSelected);
         installmentsAdapter.notifyDataSetChanged();
         hubAdapter.showInstallmentsList();
-        paymentMethodHeaderView.bringToFront();
         expandAndCollapseAnimation.expand();
     }
 
@@ -385,7 +385,6 @@ public class ExpressPaymentFragment extends Fragment implements ExpressPayment.V
         fadeAnimation.fadeIn(confirmButton);
         fadeAnimation.fadeIn(indicator);
         expandAndCollapseAnimation.collapse();
-        pagerAndConfirmButtonContainer.bringToFront();
     }
 
     @Override
