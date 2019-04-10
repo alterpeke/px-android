@@ -8,9 +8,10 @@ public class AccountMoneyDrawableFragmentItem extends DrawableFragmentItem {
 
     @NonNull public final AccountMoneyMetadata metadata;
 
-    public AccountMoneyDrawableFragmentItem(@NonNull final AccountMoneyMetadata metadata, String paymentMethodId) {
+    public AccountMoneyDrawableFragmentItem(@NonNull final AccountMoneyMetadata metadata,
+        @NonNull final String paymentMethodId) {
         this.metadata = metadata;
-        this.id = paymentMethodId;
+        id = paymentMethodId;
     }
 
     @Override

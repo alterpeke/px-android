@@ -48,7 +48,7 @@ public class SavedCardFragment extends PaymentMethodFragment {
             setPaymentMethodIcon(view, drawableCard);
             setIssuerIcon(view, drawableCard);
         } else {
-            throw new IllegalStateException("SavedCardFragment does not contains card information");
+            throw new IllegalStateException("SavedCardFragment does not contain card information");
         }
     }
 

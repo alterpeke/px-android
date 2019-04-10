@@ -62,7 +62,8 @@ import java.util.Set;
 
     private static final String BUNDLE_STATE_AVAILABLE_PM_COUNT =
         "com.mercadopago.android.px.internal.features.express.AVAILABLE_PM_COUNT";
-    private int availablePaymentMethodsCount = -1;
+    private static final int NOT_INITIALIZED_CUOUNT_VALUE = -1;
+    private int availablePaymentMethodsCount = NOT_INITIALIZED_CUOUNT_VALUE;
 
     @NonNull private final PaymentRepository paymentRepository;
     @NonNull private final AmountRepository amountRepository;
@@ -109,6 +110,12 @@ import java.util.Set;
                 throw new IllegalStateException("groups missing rendering one tap");
             }
         });
+    }
+
+    @Override
+    public void attachView(final ExpressPayment.View view) {
+        super.attachView(view);
+        loadViewModel();
     }
 
     private void loadViewModel() {
@@ -183,7 +190,9 @@ import java.util.Set;
     public void recoverFromBundle(@NonNull final Bundle bundle) {
         payerCostSelection = bundle.getParcelable(BUNDLE_STATE_PAYER_COST);
         isSplitUserPreference = bundle.getBoolean(BUNDLE_STATE_SPLIT_PREF, false);
-        availablePaymentMethodsCount = bundle.getInt(BUNDLE_STATE_AVAILABLE_PM_COUNT);
+        if (availablePaymentMethodsCount == NOT_INITIALIZED_CUOUNT_VALUE) {
+            availablePaymentMethodsCount = bundle.getInt(BUNDLE_STATE_AVAILABLE_PM_COUNT);
+        }
     }
 
     @NonNull

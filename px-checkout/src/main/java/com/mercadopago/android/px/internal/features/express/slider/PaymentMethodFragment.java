@@ -35,7 +35,7 @@ public abstract class PaymentMethodFragment extends Fragment {
             item = (DrawableFragmentItem) arguments.getSerializable(ARG_MODEL);
             paymentMethodType = arguments.getString(ARG_PM_TYPE);
         } else {
-            throw new IllegalStateException("PaymentMethodFragment does not contains model info");
+            throw new IllegalStateException("PaymentMethodFragment does not contain model info");
         }
     }
 
