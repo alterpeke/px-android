@@ -60,6 +60,10 @@ import java.util.Set;
         "com.mercadopago.android.px.internal.features.express.SPLIT_PREF";
     /* default */ boolean isSplitUserPreference = false;
 
+    private static final String BUNDLE_STATE_AVAILABLE_PM_COUNT =
+        "com.mercadopago.android.px.internal.features.express.AVAILABLE_PM_COUNT";
+    private int availablePaymentMethodsCount = -1;
+
     @NonNull private final PaymentRepository paymentRepository;
     @NonNull private final AmountRepository amountRepository;
     @NonNull private final DiscountRepository discountRepository;
@@ -107,9 +111,8 @@ import java.util.Set;
         });
     }
 
-    @Override
-    public void attachView(final ExpressPayment.View view) {
-        super.attachView(view);
+    private void loadViewModel() {
+        availablePaymentMethodsCount = countAvailablePaymentMethods();
 
         final ElementDescriptorView.Model elementDescriptorModel =
             new ElementDescriptorMapper().map(paymentConfiguration.getCheckoutPreference());
@@ -148,6 +151,26 @@ import java.util.Set;
             cancelLoading();
         }
         paymentRepository.attach(this);
+        if (shouldReloadModel()) {
+            loadViewModel();
+        }
+    }
+
+    private boolean shouldReloadModel() {
+        final int currentAvailablePaymentMethodsCount = countAvailablePaymentMethods();
+        return availablePaymentMethodsCount != currentAvailablePaymentMethodsCount;
+    }
+
+    private int countAvailablePaymentMethods() {
+        int currentAvailablePaymentMethodsCount = expressMetadataList.size();
+        for (final ExpressMetadata expressMetadata : expressMetadataList) {
+            if ((expressMetadata.isCard() &&
+                disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getCard().getId())) ||
+                disabledPaymentMethodRepository.hasPaymentMethodId(expressMetadata.getPaymentMethodId())) {
+                currentAvailablePaymentMethodsCount--;
+            }
+        }
+        return currentAvailablePaymentMethodsCount;
     }
 
     @Override
@@ -160,6 +183,7 @@ import java.util.Set;
     public void recoverFromBundle(@NonNull final Bundle bundle) {
         payerCostSelection = bundle.getParcelable(BUNDLE_STATE_PAYER_COST);
         isSplitUserPreference = bundle.getBoolean(BUNDLE_STATE_SPLIT_PREF, false);
+        availablePaymentMethodsCount = bundle.getInt(BUNDLE_STATE_AVAILABLE_PM_COUNT);
     }
 
     @NonNull
@@ -167,6 +191,7 @@ import java.util.Set;
     public Bundle storeInBundle(@NonNull final Bundle bundle) {
         bundle.putParcelable(BUNDLE_STATE_PAYER_COST, payerCostSelection);
         bundle.putBoolean(BUNDLE_STATE_SPLIT_PREF, isSplitUserPreference);
+        bundle.putInt(BUNDLE_STATE_AVAILABLE_PM_COUNT, availablePaymentMethodsCount);
         return bundle;
     }
 
